@@ -192,7 +192,7 @@ public class XmlParser : GLib.Object {
 	/**
 	 * Print a warning message.
 	 */
-	public static void warning (string message) {
+	internal static void warning (string message) {
 		print ("XML error: "); 
 		print (message);
 		print ("\n");
