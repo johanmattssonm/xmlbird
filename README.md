@@ -4,7 +4,7 @@ XML Bird is an XML parser for programs written in Vala or C.
 
     Author: Johan Mattsson
     License: LGPL v3
-    Webpage: http://birdfont.org/xmlbird
+    Webpage: http://birdfont.org/xmlbird.php
 
 ## Building from Source
 
@@ -22,6 +22,7 @@ compiled with /usr as prefix.
     ./configure --prefix=/usr
 
 Exampel usage:
+
     using B;
 
     // Print all tags and attributes in an XML document. 
