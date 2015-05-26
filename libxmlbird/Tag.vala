@@ -184,7 +184,7 @@ public class Tag : GLib.Object {
 					warn ("Expecting a separator.");
 					return new Tag.empty ();
 				}
-				
+
 				name = data.substring (index, separator - index);
 				
 				if (name.has_prefix ("!")) {
@@ -220,8 +220,10 @@ public class Tag : GLib.Object {
 					
 					closing_tag = find_closing_tag (name, end);
 					
-					if (closing_tag == -1) {
-						warn ("No closing tag.");
+					if (closing_tag == -1 || closing_tag >= data.length) {
+						print (data.to_string ());
+						print ("\n");
+						warn (@"No closing tag for $name");
 						error = true;
 						break;
 					}
@@ -274,7 +276,7 @@ public class Tag : GLib.Object {
 	
 		index = entire_file.get_index (data) + start;
 		while (true) {
-			while (!entire_file.substring (index).has_prefix ("</")) {
+			while (!entire_file.substring (index).has_prefix ("<")) {
 				index = entire_file.find_next_tag_token (index + 1);
 				
 				if (index == -1) {
@@ -305,9 +307,9 @@ public class Tag : GLib.Object {
 							return previous_index;
 						}
 					}
-				} else if (is_tag (entire_file, name, slash_index)) {
+				} else if (is_tag (entire_file, name, slash_index - "/".length)) {
 					start_count++;
-				}
+				} 
 			}
 		}
 		
