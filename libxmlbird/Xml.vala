@@ -21,7 +21,7 @@ internal const int WARNINGS = 1;
 /** 
  * XML parser
  * 
- * A tiny XML parser written in Vala.
+ * XML parser written in Vala.
  * 
  * Example:
  * {{{

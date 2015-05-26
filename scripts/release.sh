@@ -43,7 +43,7 @@ mv xmlbird-$version.tar.xz ../
 # build it to make sure that everything was checked in
 cd xmlbird-$version && \
 ./configure && \
-./scripts/linux_build.py && \
+doit && \
 gpg --output ../../xmlbird-$version.tar.xz.sig --detach-sig ../../xmlbird-$version.tar.xz && \
 cd .. && \
 rm -rf ../export/xmlbird-$version
