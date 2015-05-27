@@ -69,14 +69,19 @@ internal class XmlData : XmlString {
 		const char first_bit = 1 << 7;
 		int i = 0;
 		char* d = data;
+ 		char c;
  		
- 		while (d[i] != '\0') {
-			if ((int) (d[i] & first_bit) == 0) {
-				if (d[i] == '<') {
+ 		c = d[i];
+ 		
+ 		while (c != '\0') {
+			if ((int) (c & first_bit) == 0) {
+				if (c == '<') {
 					add_tag (i);
 				}
 			}
+			
 			i++;
+			c = d[i];
 		}
 	}
 	

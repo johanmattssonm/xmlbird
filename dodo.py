@@ -26,6 +26,7 @@ from doit.action import CmdAction
 from scripts.bavala import Vala
 from scripts import version
 from scripts import config
+from scripts.run import run
 
 DOIT_CONFIG = {
     'default_tasks': [
@@ -42,6 +43,11 @@ valac_options = [
 	'--enable-experimental-non-null',
 	'--enable-experimental'
 	]
+
+tests = [
+    "minimal",
+    "benchmark"
+]
 
 if "bsd" in sys.platform:
     LIBXMLBIRD_SO_VERSION='${LIBxmlbird_VERSION}'
@@ -90,3 +96,41 @@ def task_pkg_flags():
             'actions': [CmdAction(cmd.format(pkg=pkg), save_out='out')],
             'uptodate': [run_once],
             }
+
+def task_build_tests():
+    """build tests"""
+    
+    def compile_tests():
+        for t in tests:
+            compile_test (t)
+        
+    def compile_test(test):
+        run("valac --includedir=build --vapidir=build --pkg=xmlbird tests/Test.vala tests/" + test + ".vala -o build/" + test)
+
+    return {
+	     'actions': [compile_tests]
+    }
+    
+def task_test():
+    """run tests"""
+    
+    def run_tests():
+        print('Running tests')
+        failed = 0
+        passed = 0
+        for t in tests:
+            process = subprocess.Popen ("./build/" + t, shell=True)
+            process.communicate()[0]
+            if not process.returncode == 0:
+					 print(t + ' Failed')
+					 failed = failed + 1
+            else:
+			       passed = passed + 1
+			       
+        print(str(passed) + ' tests passed and ' + str(failed) + ' failed.')
+		   
+    return {
+	     'actions': [run_tests],
+	     'task_dep': ['build_tests'],
+	     'verbosity': 2
+    }

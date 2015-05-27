@@ -65,3 +65,9 @@ Exampel usage:
             print ("\n");
         }
     }
+
+## Hacking
+
+There is a test suite with benchmarking code. Run “doit test”.
+
+

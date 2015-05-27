@@ -15,9 +15,10 @@ namespace B {
 
 class Test : GLib.Object {
 	XmlParser parser;
+	string data;
 	
 	public Test (string xml_data) {
-		parser = new XmlParser (xml_data);
+		this.data = xml_data;
 	}
 	
 	public void test (string values) {
@@ -30,10 +31,23 @@ class Test : GLib.Object {
 		}
 	}
 	
+	public void benchmark (string task_name) {
+		double start_time, stop_time, t;
+		
+		start_time = GLib.get_real_time ();
+		get_content ();
+		stop_time = GLib.get_real_time ();
+		
+		t = (stop_time - start_time) / 1000000.0;
+		
+		print (task_name + @" took $t seconds.\n");
+	}
+	
 	public string get_content () {
 		Tag root;
 		StringBuilder content;
 		
+		parser = new XmlParser (data);
 		content = new StringBuilder ();
 		root = parser.get_root_tag ();
 		add_tag (content, root);
