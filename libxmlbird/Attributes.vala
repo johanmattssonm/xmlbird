@@ -31,7 +31,6 @@ public class Attributes : GLib.Object {
 	public class Iterator : GLib.Object {
 		Tag tag;
 		Attribute? next_attribute;
-		int iterator_refcount = 1;
 		
 		internal Iterator (Tag t) {
 			tag = t;
