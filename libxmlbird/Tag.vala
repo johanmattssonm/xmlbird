@@ -265,7 +265,6 @@ public class Tag : GLib.Object {
 		int previous_index;
 		unichar c, slash;
 		int start_count = 1;
-		int next_tag;
 		
 		if (name.length == 0) {
 			error = true;
@@ -451,7 +450,6 @@ public class Tag : GLib.Object {
 	public class Iterator : GLib.Object {
 		Tag tag;
 		Tag? next_tag = null;
-		int iterator_efcount = 1;
 		
 		internal Iterator (Tag t) {
 			tag = t;

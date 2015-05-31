@@ -68,6 +68,6 @@ Exampel usage:
 
 ## Hacking
 
-There is a test suite with benchmarking code. Run “doit test”.
+There is a test suite with benchmarks. Run “doit test”.
 
 

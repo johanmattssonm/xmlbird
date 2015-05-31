@@ -128,30 +128,6 @@ internal class XmlData : XmlString {
 		
 		return true;
 	}
-	
-	public void print_all () {
-		XmlString s;
-		int i = -1;
-		string e;
-		
-		print("All tags:\n");
-		
-		for (int j = 0; j < tags_size; j++) {
-			i = find_next_tag_token (i + 1);
-			
-			if (i > -1) {
-				s = substring (i);
-				s = s.substring (0, s.index_of (">"));
-				s = s.substring (0, s.index_of (" "));
-			} else {
-				e = "error";
-				s = new XmlString (e, e.length); 
-			}
-			
-			int o = start_tags[j];
-			print (s.to_string () + " : " + ((string) (data + o)).ndup (4) + @"  $o $j   i: $i\n");
-		}
-	}
 }
 
 }
