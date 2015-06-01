@@ -23,27 +23,27 @@ cd export
 
 version=$(cat ../../scripts/version.py | grep "XMLBIRD_VERSION = '" | sed -e "s:XMLBIRD_VERSION = '::" | sed "s:'.*::g")
 
-rm -rf xmlbird-$version
+rm -rf libxmlbird-$version
 
 git clone --depth 1 --no-hardlinks --local $rep
 
-mv xmlbird xmlbird-$version
+mv xmlbird libxmlbird-$version
 
-rm -rf xmlbird-$version/.git
-rm -rf xmlbird-$version/.gitignore
+rm -rf libxmlbird-$version/.git
+rm -rf libxmlbird-$version/.gitignore
 
-tar -cf xmlbird-$version.tar xmlbird-$version
+tar -cf libxmlbird-$version.tar libxmlbird-$version
 
-xz -z xmlbird-$version.tar
+xz -z libxmlbird-$version.tar
 
-rm -rf ../xmlbird-$version.tar.xz
+rm -rf ../libxmlbird-$version.tar.xz
 
-mv xmlbird-$version.tar.xz ../
+mv libxmlbird-$version.tar.xz ../
 
 # build it to make sure that everything was checked in
-cd xmlbird-$version && \
+cd libxmlbird-$version && \
 ./configure && \
 doit && \
-gpg --output ../../xmlbird-$version.tar.xz.sig --detach-sig ../../xmlbird-$version.tar.xz && \
+gpg --output ../../libxmlbird-$version.tar.xz.sig --detach-sig ../../libxmlbird-$version.tar.xz && \
 cd .. && \
-rm -rf ../export/xmlbird-$version
+rm -rf ../export/libxmlbird-$version
