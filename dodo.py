@@ -27,6 +27,7 @@ from scripts.bavala import Vala
 from scripts import version
 from scripts import config
 from scripts.run import run
+from scripts.pkgconfig import generate_pkg_config_file
 
 DOIT_CONFIG = {
     'default_tasks': [
@@ -68,22 +69,8 @@ def task_distclean ():
 
 def task_pkgconfig():
     """generate a pkg-config file"""
-
-    def write_pc_file():
-        f = open('./build/xmlbird.pc', 'w+')
-        f.write("prefix=" + config.PREFIX + "\n")
-        f.write("""exec_prefix=${prefix}
-includedir=${prefix}/include
-libdir=${exec_prefix}/lib
-
-Name: xmlbird
-Description: XML parser
-Version: 1.0.0
-Cflags: -I${includedir}
-Libs: -L${libdir} -lxmlbird
-""")
     return {
-	     'actions': [write_pc_file]
+	     'actions': [generate_pkg_config_file]
     }
 
 def task_pkg_flags():

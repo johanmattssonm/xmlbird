@@ -103,9 +103,9 @@ elif os.path.isfile ('build/libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION):
    link (libdir, 'libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION, ' libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION_MAJOR)
    link (libdir, 'libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION, ' libxmlbird.so')
 elif os.path.isfile ('build/bin/libxmlbird.' + version.LIBXMLBIRD_SO_VERSION + '.dylib'):
-   install ('build/bin/libxmlbird.' + version.LIBXMLBIRD_SO_VERSION + '.dylib', libdir, 644)
-   link (libdir, 'libxmlbird.' + version.LIBXMLBIRD_SO_VERSION + '.dylib', ' libxmlbird.dylib.' + version.LIBXMLBIRD_SO_VERSION_MAJOR)
-   link (libdir, 'libxmlbird.' + version.LIBXMLBIRD_SO_VERSION + '.dylib', ' libxmlbird.dylib')
+   install ('build/bin/libxmlbird-' + version.LIBXMLBIRD_SO_VERSION + '.dylib', libdir, 644)
+   link (libdir, 'libxmlbird-' + version.LIBXMLBIRD_SO_VERSION + '.dylib', ' libxmlbird.dylib.' + version.LIBXMLBIRD_SO_VERSION_MAJOR)
+   link (libdir, 'libxmlbird-' + version.LIBXMLBIRD_SO_VERSION + '.dylib', ' libxmlbird.dylib')
 else:
    print ("Can't find libxmlbird.")
    exit (1)
