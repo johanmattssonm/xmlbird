@@ -112,5 +112,5 @@ else:
 
 install ('build/xmlbird.h', '/include', 644)
 install ('build/xmlbird.vapi', '/share/vala/vapi', 644)
-install ('build/xmlbird.pc', '/lib/pkgconfig', 644)
+install ('build/xmlbird.pc', libdir + '/pkgconfig', 644)
 
