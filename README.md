@@ -1,3 +1,5 @@
+![xmlbird logo][xmlbird]
+
 # XML Bird - XML parser
 
 XML Bird is an XML parser for programs written in Vala or C.
@@ -69,5 +71,7 @@ Exampel usage:
 ## Hacking
 
 There is a test suite with benchmarks. Run “doit test”.
+
+[xmlbird]: http://birdfont.org/images/xmlbird-icon.png "XML Bird icon"
 
 
