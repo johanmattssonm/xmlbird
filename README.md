@@ -72,6 +72,9 @@ Exampel usage:
 
 There is a test suite with benchmarks. Run “doit test”.
 
+XML Bird is a part of the [Birdfont][birdfont] project.
+
 [xmlbird]: http://birdfont.org/images/xmlbird-icon.png "XML Bird icon"
+[birdfont]: http://birdfont.org/ "Birdfont – Font Editor"
 
 
