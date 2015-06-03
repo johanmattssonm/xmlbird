@@ -17,7 +17,7 @@ run ("""gcc -fPIC -c \
 run ("mv *.o build/libxmlbird/");
 
 run ("""gcc -shared \
-		-Wl,-soname,"""  + PREFIX + """/lib/libxmlbird-""" + LIBXMLBIRD_SO_VERSION + """.so \
+		-Wl,-soname,""" + "libxmlbird.so." + LIBXMLBIRD_SO_VERSION + "\
 		build/libxmlbird/*.o \
 		$(pkg-config --libs glib-2.0) \
 		$(pkg-config --libs gobject-2.0) \
