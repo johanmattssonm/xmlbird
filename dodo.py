@@ -50,7 +50,9 @@ tests = [
     "benchmark"
 ]
 
-if "bsd" in sys.platform:
+if "kfreebsd" in sys.platform:
+    LIBXMLBIRD_SO_VERSION=version.LIBXMLBIRD_SO_VERSION
+elif "bsd" in sys.platform:
     LIBXMLBIRD_SO_VERSION='${LIBxmlbird_VERSION}'
 else:
     LIBXMLBIRD_SO_VERSION=version.LIBXMLBIRD_SO_VERSION
