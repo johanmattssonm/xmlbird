@@ -1,8 +1,10 @@
 #!/bin/sh
 
-ls ./build/bin
+PKG_PATH=$(dirname "$(readlink -f "$0")")
+cd "${PKG_PATH}"
+
 if [ -e $1 ]; then
-	PKG_PATH=./build/bin $1
+	LD_LIBRARY_PATH=./build/bin:$LD_LIBRARY_PATH $1
 	exit $?
 fi
 
