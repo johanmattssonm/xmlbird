@@ -1,0 +1,9 @@
+language: c
+compiler: gcc
+before_install:
+  - sudo add-apt-repository ppa:vala-team/ppa -y
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq libglib2.0-dev libgee-dev valac-0.22
+script:
+  - python2 ./configure
+  - python2 ./scripts/build_linux.py
