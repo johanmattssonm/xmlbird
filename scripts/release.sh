@@ -17,6 +17,7 @@ mv xmlbird libxmlbird-$version
 
 rm -rf libxmlbird-$version/.git
 rm -rf libxmlbird-$version/.gitignore
+rm -rf libxmlbird-$version/.travis.yml
 
 tar -cf libxmlbird-$version.tar libxmlbird-$version
 
