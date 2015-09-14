@@ -7,3 +7,5 @@ before_install:
 script:
   - python2 ./configure
   - python2 ./scripts/build_linux.py
+  - python2 ./scripts/build_tests.py 
+  - python2 ./scripts/test.py 

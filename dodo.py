@@ -45,10 +45,13 @@ valac_options = [
 	'--enable-experimental'
 	]
 
-tests = [
-    "minimal",
-    "benchmark"
-]
+tests = []
+f = open("tests/all_tests.txt")
+line = f.readline().strip ()
+while line:
+    if not line == "":
+        tests += [line]
+    line = f.readline().strip ()
 
 if "kfreebsd" in sys.platform:
     LIBXMLBIRD_SO_VERSION=version.LIBXMLBIRD_SO_VERSION
