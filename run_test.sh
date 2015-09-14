@@ -1,7 +1,6 @@
 #!/bin/sh
-PKG_PATH=$(dirname "$(readlink -f "$1")")
+PKG_PATH=./build/bin
 
-echo $PKG_PATH
 if [ -e $1 ]; then
 	$1
 	exit $?
