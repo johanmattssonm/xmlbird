@@ -100,7 +100,7 @@ def task_test():
         failed = 0
         passed = 0
         for t in tests:
-            process = subprocess.Popen ("./build/bin/" + t, shell=True)
+            process = subprocess.Popen ("./run_test.sh ./build/bin/" + t, shell=True)
             process.communicate()[0]
             if not process.returncode == 0:
 					 print(t + ' Failed')

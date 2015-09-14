@@ -6,12 +6,13 @@ from tests import get_tests
 tests = get_tests();
 
 for test in tests:
-    process = subprocess.Popen("./build/bin/" + test, shell=True)
+    print('Running tests:')
+    process = subprocess.Popen("./run_test.sh ./build/bin/" + test, shell=True)
     process.communicate()[0]
     
     if not process.returncode == 0:
-        print(test + ' Failed')
+        print(test + ' failed')
         exit (1)
     else:
-        print(test + ' Passed')
+        print(test + ' passed')
     
