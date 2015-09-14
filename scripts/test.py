@@ -1,16 +1,12 @@
 #!/usr/bin/python
 import subprocess
 
-tests = []
-f = open("tests/all_tests.txt")
-line = f.readline().strip ()
-while line:
-    if not line == "":
-        tests += [line]
-    line = f.readline().strip ()
+from tests import get_tests
+
+tests = get_tests();
 
 for test in tests:
-    process = subprocess.Popen ("./build/" + test, shell=True)
+    process = subprocess.Popen("./build/bin/" + test, shell=True)
     process.communicate()[0]
     
     if not process.returncode == 0:

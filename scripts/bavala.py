@@ -102,13 +102,22 @@ class Vala(object):
             self.header = join(build, library) + '.h'
             self.vapi = join(build, library) + '.vapi' # generated vapi file
             self.other_vapi_files = get_sources_path (src, '*.vapi') # other vapi files
-            self.so = join(build, src) + '.so.' + so_version
-            self.so_link = join(build, src) + '.so'
+            self.so = join(build, 'bin', src) + '.so.' + so_version
+            self.so_link = join(build, 'bin', src) + '.so'
             self.so_link_name = src + '.so'
             self.so_version = so_version
             self.so_name = 'lib' + library + '.so.' + so_version
         else:
             self.other_vapi_files = []
+
+        process = subprocess.Popen ('mkdir -p build/bin ',
+                                    shell=True,
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE)
+        process.communicate()[0]
+        if not process.returncode == 0:
+            print ( "Can't create dir: " + l)
+            exit (1)
 
     def gen_c(self, opts):
         """translate code from vala to C and create .vapi"""
@@ -196,13 +205,17 @@ class Vala(object):
             obj_glob = join(self.build, self.src, '*.o')
             opts = ['-shared ' 
                     + '-Wl,-soname,' + self.so_name 
-			        + ' ' + obj_glob
+                    + ' ' + obj_glob
                     + ' -o ' + self.so ]
 
             flags = []
             for l in libs:
                 if not l == "posix" and not l == "posixtypes":
-                    process = subprocess.Popen ('pkg-config --cflags ' + l, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    process = subprocess.Popen ('pkg-config --cflags ' + l,
+                        shell=True,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE)
+
                     cflags = process.stdout.readline()
                     process.communicate()[0]
                     if not process.returncode == 0:
@@ -232,7 +245,7 @@ class Vala(object):
         elif not "bsd" in sys.platform:
             create_link = "ln -s -T " + so_file + " " + self.so_link_name + " "
 
-        create_link += "&& mv " + self.so_link_name + " " + self.build + "/" 
+        create_link += "&& mv " + self.so_link_name + " " + self.build + "/bin" 
         return {
             'name': self.so_link_name,
             'actions': [ create_link],

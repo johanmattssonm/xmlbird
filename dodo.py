@@ -28,6 +28,8 @@ from scripts import version
 from scripts import config
 from scripts.run import run
 from scripts.pkgconfig import generate_pkg_config_file
+from scripts.tests import all_tests
+from scripts.tests import build_tests
 
 DOIT_CONFIG = {
     'default_tasks': [
@@ -45,13 +47,7 @@ valac_options = [
 	'--enable-experimental'
 	]
 
-tests = []
-f = open("tests/all_tests.txt")
-line = f.readline().strip ()
-while line:
-    if not line == "":
-        tests += [line]
-    line = f.readline().strip ()
+tests = all_tests ();
 
 if "kfreebsd" in sys.platform:
     LIBXMLBIRD_SO_VERSION=version.LIBXMLBIRD_SO_VERSION
@@ -91,16 +87,9 @@ def task_pkg_flags():
 
 def task_build_tests():
     """build tests"""
-    
-    def compile_tests():
-        for t in tests:
-            compile_test (t)
-        
-    def compile_test(test):
-        run("valac --includedir=build --vapidir=build --pkg=xmlbird tests/Test.vala tests/" + test + ".vala -o build/" + test)
-
     return {
-	     'actions': [compile_tests]
+	     'actions': [build_tests],
+	     'task_dep': ['libxmlbird'],
     }
     
 def task_test():
@@ -111,7 +100,7 @@ def task_test():
         failed = 0
         passed = 0
         for t in tests:
-            process = subprocess.Popen ("./build/" + t, shell=True)
+            process = subprocess.Popen ("./build/bin/" + t, shell=True)
             process.communicate()[0]
             if not process.returncode == 0:
 					 print(t + ' Failed')
