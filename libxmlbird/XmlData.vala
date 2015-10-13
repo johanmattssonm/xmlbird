@@ -21,6 +21,8 @@ internal class XmlData : XmlString {
 	
 	internal bool error = false;
 	
+	const char FIRST_BIT = 1 << 7;
+	
 	public XmlData (char* data, int length) {
 		base (data, length);
 
@@ -66,7 +68,6 @@ internal class XmlData : XmlString {
 	}
 
 	void index_start_tags () {
-		const char first_bit = 1 << 7;
 		int i = 0;
 		char* d = data;
  		char c;
@@ -74,7 +75,12 @@ internal class XmlData : XmlString {
  		c = d[i];
  		
  		while (c != '\0') {
-			if ((int) (c & first_bit) == 0) {
+			if ((int) (c & FIRST_BIT) == 0) {
+				
+				if (c == '"') {
+					i = skip_quote (d, i);
+				}
+				
 				if (c == '<') {
 					add_tag (i);
 				}
@@ -83,6 +89,31 @@ internal class XmlData : XmlString {
 			i++;
 			c = d[i];
 		}
+	}
+	
+	int skip_quote (char* data, int i) {
+ 		char c;
+ 		
+ 		c = data[i];
+ 		
+		if (unlikely (c != '"')) {
+			warning ("Not a quote.");
+			error = true;
+			return i + 1;
+		}
+		
+ 		while (c != '\0') {
+			if ((int) (c & FIRST_BIT) == 0) {
+				if (c == '"') {
+					return i + 1;
+				}
+			}
+			
+			i++;
+			c = data[i];
+		}
+		
+		return i;
 	}
 	
 	void add_tag (int index) {
