@@ -54,6 +54,7 @@ public class Tag : GLib.Object {
 		data = new XmlString ("", 0);
 		attributes = new XmlString ("", 0);
 		name = new XmlString ("", 0);
+		error = true;
 	}
 	
 	/** 
@@ -134,9 +135,14 @@ public class Tag : GLib.Object {
 		int end_tag_index;
 		Tag tag;
 		
+		if (error) {
+			has_tags = false;
+			return new Tag.empty ();
+		}
+		
 		tag = find_next_tag (tag_index, out end_tag_index);
 
-		if (end_tag_index != -1) {
+		if (end_tag_index != -1 && error == false) {
 			tag_index = end_tag_index;
 			has_tags = true;
 			return tag;
@@ -157,6 +163,10 @@ public class Tag : GLib.Object {
 		XmlString name;
 		XmlString attributes;
 		XmlString content;
+
+		if (error) {
+			return new Tag.empty ();
+		}
 
 		end_tag_index = -1;
 			
@@ -535,7 +545,11 @@ public class Tag : GLib.Object {
 			} else {
 				next_tag = null;
 			}
-									
+
+			if (next_tag != null && ((!) next_tag).error) { 
+				next_tag = null;
+			}
+															
 			return next_tag != null;
 		}
 

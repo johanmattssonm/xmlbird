@@ -112,7 +112,7 @@ public class XmlParser : GLib.Object {
 	
 	void validate_tags (Tag tag) {
 		Attributes attributes = tag.get_attributes ();
-		
+
 		foreach (Attribute a in attributes) {
 			if (tag.has_failed () || a.get_name_length () == 0) {
 				error = true;
@@ -125,7 +125,6 @@ public class XmlParser : GLib.Object {
 				error = true;
 				return;
 			}
-			
 			validate_tags (t);
 		}		
 	}

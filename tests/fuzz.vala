@@ -11,7 +11,10 @@ int main (string[] args) {
 	FileUtils.get_contents (filename, out xml);
 	
 	Test test = new Test (xml);
-	test.get_content ();
+	
+	if (test.validate ()) {
+		test.get_content ();
+	}
 	
 	return 0;
 }
