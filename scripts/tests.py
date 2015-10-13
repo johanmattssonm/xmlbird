@@ -27,7 +27,7 @@ def all_tests():
     return tests
 
 def build_tests():
-    tests = all_tests()
+    tests = all_tests() + ["fuzz"]
     run ("mkdir -p build/bin");
     run ("mkdir -p build/tests");
 

@@ -21,6 +21,11 @@ class Test : GLib.Object {
 		this.data = xml_data;
 	}
 	
+	public bool validate () {
+		parser = new XmlParser (data);
+		return parser.validate ();
+	}
+	
 	public void test (string values) {
 		string content = get_content ();
 		bool pass = content == values;

@@ -91,7 +91,14 @@ def task_build_tests():
 	     'actions': [build_tests],
 	     'task_dep': ['libxmlbird'],
     }
-    
+
+def task_fuzz():
+    """run fuzz test"""
+    return {
+	     'actions': ['./tests/fuzz.py'],
+	     'task_dep': ['build_tests'],
+    }
+        
 def task_test():
     """run tests"""
     
