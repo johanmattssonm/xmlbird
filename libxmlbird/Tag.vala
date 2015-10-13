@@ -187,11 +187,18 @@ public class Tag : GLib.Object {
 
 				name = data.substring (index, separator - index);
 				
+				if (name.to_string () == "") {
+					warn ("A tag without a name.");
+					error = true;
+					return new Tag.empty ();
+				}
+				
 				if (name.has_prefix ("!")) {
 					continue;
 				}
 				
-				end = data.index_of (">", separator);
+				// skip attributes
+				end = find_end_of_tag (separator); 
 								
 				if (end == -1) {
 					error = true;
@@ -212,8 +219,8 @@ public class Tag : GLib.Object {
 						break;
 					}
 					
-					if (c != '>') {
-						warn ("Expecting '>'");
+					if (unlikely (c != '>')) {
+						warn (@"Expecting '>' found $((!) c.to_string ())");
 						error = true;
 						break;
 					}
@@ -229,7 +236,14 @@ public class Tag : GLib.Object {
 					}
 					
 					content = data.substring (end, closing_tag - end);
-					end_tag_index = data.index_of (">", closing_tag);
+					end_tag_index = find_end_of_tag (closing_tag);
+									
+					if (end_tag_index == -1) {
+						error = true;
+						warn ("Expecting > for the closing tag.");
+						return new Tag.empty ();
+					}
+					
 					data.get_next_ascii_char (ref end_tag_index, out c);
 				}
 				
@@ -257,6 +271,48 @@ public class Tag : GLib.Object {
 		}
 		
 		return -1;
+	}
+	
+	int find_end_of_tag (int start) {
+		int index;
+		int current;
+		unichar c;
+
+		index = start;
+		current = start;
+		while (data.get_next_ascii_char (ref index, out c)) {
+			if (c == '>') {
+				return current;
+			}
+			
+			if (c == '"') {
+				index = find_end_quote (index);
+				
+				if (index == -1) {					
+					break;
+				}
+				
+				data.get_next_ascii_char (ref index, out c);
+			}
+			
+			current = index;
+		}
+		
+		error = true;
+		warn ("Tag not closed.");
+		
+		return -1;
+	}
+	
+	int find_end_quote (int start) {
+		int i = data.index_of ("\"", start);
+		
+		if (i == -1) {
+			warn ("Expecting end quote.");
+			error = true;
+		}
+		
+		return i;
 	}
 	
 	int find_closing_tag (XmlString name, int start) {

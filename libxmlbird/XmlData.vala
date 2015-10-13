@@ -79,6 +79,11 @@ internal class XmlData : XmlString {
 				
 				if (c == '"') {
 					i = skip_quote (d, i);
+					
+					if (i == -1) {
+						error = true;
+						break;
+					}
 				}
 				
 				if (c == '<') {
@@ -113,7 +118,7 @@ internal class XmlData : XmlString {
 			c = data[i];
 		}
 		
-		return i;
+		return -1;
 	}
 	
 	void add_tag (int index) {

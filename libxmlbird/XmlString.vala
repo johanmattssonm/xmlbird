@@ -123,7 +123,7 @@ internal class XmlString : GLib.Object {
 		if (len == -1) {
 			return new XmlString (data + offset, length - offset);
 		}
-		
+
 		Posix.assert (len + offset < length); 
 		return new XmlString (data + offset, len);
 	} 

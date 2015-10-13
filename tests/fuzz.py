@@ -17,7 +17,7 @@ def fuzz():
         print('Can not create a fuzzed file. Radamsa is required.')
         exit(1)
 
-    process = subprocess.Popen ('./build/bin/fuzz ' + fuzzed_file, shell=True)
+    process = subprocess.Popen ('./run_fuzz.sh ' + fuzzed_file, shell=True)
     process.communicate()[0]
     if not process.returncode == 0:
         print("A bug was found.")
