@@ -196,7 +196,13 @@ public class Tag : GLib.Object {
 				if (name.has_prefix ("!")) {
 					continue;
 				}
-				
+
+				if (name.has_prefix ("/")) {
+					warn ("Expecting a new tag. Found a closing tag.");
+					error = true;
+					return new Tag.empty ();
+				}
+								
 				// skip attributes
 				end = find_end_of_tag (separator); 
 								
@@ -330,6 +336,13 @@ public class Tag : GLib.Object {
 		}
 	
 		index = entire_file.get_index (data) + start;
+		
+		if (index >= entire_file.length) {
+			warn ("Unexpected end of file");
+			error = true;
+			return -1;
+		}
+		
 		while (true) {
 			while (!entire_file.substring (index).has_prefix ("<")) {
 				index = entire_file.find_next_tag_token (index + 1);

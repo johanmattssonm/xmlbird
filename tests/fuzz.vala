@@ -1,4 +1,4 @@
-using B;
+namespace B {
 
 int main (string[] args) {
 	if (args.length != 2) {
@@ -10,8 +10,10 @@ int main (string[] args) {
 	string xml;
 	FileUtils.get_contents (filename, out xml);
 	
-	B.Test test = new B.Test (xml);
+	Test test = new Test (xml);
 	test.get_content ();
 	
 	return 0;
+}
+
 }
