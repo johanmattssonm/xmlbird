@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 import subprocess
-from config import PREFIX
-from run import run
-from version import LIBXMLBIRD_SO_VERSION
+from scripts.config import PREFIX
+from scripts.run import run
+from scripts.version import LIBXMLBIRD_SO_VERSION
 
 def read_elements(file):
     tests = []

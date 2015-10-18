@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import subprocess
-import tests
+from scripts import tests
 
 tests = tests.get_tests();
 
