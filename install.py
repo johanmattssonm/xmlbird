@@ -61,10 +61,6 @@ def link (dir, file, linkname):
 	print ("install link: " + f)
 	run ('cd ' + dest + prefix + dir + ' && ln -sf ' + file + ' ' + linkname)
 	
-if not os.path.exists ("build/configured"):
-	print ("Project is not configured")
-	exit (1)
-
 parser = OptionParser()
 parser.add_option ("-l", "--libdir", dest="libdir", help="path to directory for shared libraries (lib or lib64).")
 parser.add_option ("-d", "--dest", dest="dest", help="install to this directory", metavar="DEST")
@@ -110,7 +106,7 @@ else:
    print ("Can't find libxmlbird.")
    exit (1)
 
-install ('build/xmlbird.h', '/include', 644)
+install ('build/xmlbird/xmlbird.h', '/include', 644)
 install ('build/xmlbird.vapi', '/share/vala/vapi', 644)
 install ('build/xmlbird.pc', libdir + '/pkgconfig', 644)
 

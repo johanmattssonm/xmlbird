@@ -6,6 +6,7 @@ import sys
 from scripts import version
 from scripts import config
 from scripts import tests
+from scripts import pkgconfig
 from scripts.builder import Builder
 
 DOIT_CONFIG = {
@@ -69,7 +70,16 @@ def task_libxmlbird():
         LIBXMLBIRD_SO_VERSION=version.LIBXMLBIRD_SO_VERSION
     
     yield make_libxmlbird('libxmlbird.so.' + LIBXMLBIRD_SO_VERSION)
-    
+
+def make_libxmlbird_pkgconfig():
+    pkgconfig.generate_pkg_config_file ()
+
+def task_libxmlbird_pkgconfig():
+    """build tests"""
+    return {
+	     'actions': [make_libxmlbird_pkgconfig],
+	     'task_dep': ['libxmlbird'],
+    }
     
 def task_distclean ():
     return  {
@@ -82,7 +92,7 @@ def task_build_tests():
 	     'actions': [tests.build_tests],
 	     'task_dep': ['libxmlbird'],
     }
-
+    
 def task_fuzz():
     """run fuzz test"""
     return {

@@ -16,7 +16,9 @@ elif platform == 'darwin':
 elif "openbsd" in platform:
 	process_tasks(dodo.make_libxmlbird('libxmlbird.so.${LIBxmlbird_VERSION}'))
 else:
-	process_tasks(dodo.make_libxmlbird('libxmlbird.so'))
+	process_tasks(dodo.make_libxmlbird('libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION))
 	tests.build_tests();
-	
+
+dodo.make_libxmlbird_pkgconfig ()
+
 print('Done')

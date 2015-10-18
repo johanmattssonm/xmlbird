@@ -1,4 +1,4 @@
-import config
+from scripts import config
 
 def generate_pkg_config_file():
         f = open('./build/xmlbird.pc', 'w+')
