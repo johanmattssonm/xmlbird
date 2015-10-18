@@ -32,12 +32,14 @@ def make_libxmlbird(target_binary):
         """ + config.VALACFLAGS.get("xmlbird", "") + """ \
         --enable-experimental \
         --library libxmlbird \
+        --vapi=./build/xmlbird.vapi \
         -H build/xmlbird/xmlbird.h \
         libxmlbird/*.vala \
         """
 
     cc_command = config.CC + " " + config.CFLAGS.get("xmlbird", "") + """ \
             -c C_SOURCE \
+            -I ./build/xmlbird \
             -fPIC \
             $(pkg-config --cflags glib-2.0) \
             -o OBJECT_FILE"""

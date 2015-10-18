@@ -32,10 +32,11 @@ def build_tests():
     run ("mkdir -p build/tests");
 
     for test in tests:
-        run ("valac --ccode --pkg posix --pkg=xmlbird --vapidir=./build "
+        run ("valac --ccode --pkg=posix --pkg=xmlbird --vapidir=./build "
              + "--directory=./build tests/" + test + ".vala tests/Test.vala");
 
         run ("""gcc -fPIC -c \
+			-I ./build/xmlbird \
              $(pkg-config --cflags glib-2.0) \
              $(pkg-config --cflags gobject-2.0) \
              -I ./build -L./build/bin -lxmlbird \
