@@ -1,9 +1,8 @@
 #!/usr/bin/python
 import subprocess
+import tests
 
-from tests import get_tests
-
-tests = get_tests();
+tests = tests.get_tests();
 
 for test in tests:
     print('Running tests:')
