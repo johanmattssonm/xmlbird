@@ -6,6 +6,7 @@ from sys import platform
 from scripts.builder import process_tasks
 from scripts import config
 from scripts import version
+from scripts import tests
 
 if platform == 'msys':
 	process_tasks(dodo.make_libxmlbird('libbirdgems.dll', []))
@@ -16,5 +17,6 @@ elif "openbsd" in platform:
     process_tasks(dodo.make_libxmlbird('libxmlbird.so.${LIBxmlbird_VERSION}'))
 else:
 	process_tasks(dodo.make_libxmlbird('libxmlbird.so'))
+	tests.build_tests();
 	
 print('Done')
