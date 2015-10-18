@@ -1,14 +1,16 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import subprocess
 import os
 import sys
 import time;
 from optparse import OptionParser
-from scripts import version
 from scripts import configfile
 import re
+
 from scripts.run import run
 
+TARGETS = ['xmlbird', 'tests']
+           
 HEADER = '\033[95m'
 OKBLUE = '\033[94m'
 OKGREEN = '\033[92m'
@@ -17,27 +19,27 @@ FAIL = '\033[91m'
 ENDC = '\033[0m'
 
 def test_program_version (program, a, b, c):
-	print ("Checking for %s version >= %s.%s.%s" % (program, a, b, c))
+	print ('Checking for %s version >= %s.%s.%s' % (program, a, b, c))
 	process = subprocess.Popen (program + ' --version', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-	v = process.stdout.readline()
+	v = process.stdout.readline().decode('utf-8')
 	process.communicate()[0]
 	if not process.returncode == 0:
-		print (FAIL + "Not found" + ENDC)
+		print (FAIL + 'Not found' + ENDC)
 		exit (1)		
-	print ("Found " + v)
+	print ('Found ' + v)
 	
-	o = v.split (" ");
+	o = v.split (' ');
 	for s in o:
 		if re.search( r'[0-9]*\.', s):
 			v = s
 			break
 			
 	v = re.sub(r'[a-zA-Z\-].*', '0', v)
-	version = [int(n) for n in v.split (".")]
+	version = [int(n) for n in v.split ('.')]
 	return [a,b,c] <= version	
 
 def test_library_version (lib):
-	print ("Looking for library: " + lib + "\t\t")
+	print ('Looking for library: ' + lib + '\t\t')
 	process = subprocess.Popen ('pkg-config --modversion ' + lib, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 	process.communicate()[0]
 	return process.returncode == 0
@@ -47,35 +49,69 @@ def configure ():
 		print (FAIL + "valac is too old." + ENDC)
 		exit (1)
 
-
-	libs = [ 'glib-2.0' ]
-
-	for lib in libs:
-		if not test_library_version (lib):
-			print (FAIL + "Can not find " + lib + ENDC)
-			exit (1)
-
-	run ('mkdir -p build')
-	run ('touch build/configured')
-
-	print ("");
-	print (OKGREEN + "Done" + ENDC);
-
-
 parser = OptionParser()
-parser.add_option("-p", "--prefix", dest="prefix", help="Install prefix", metavar="PREFIX")
-parser.add_option("-c", "--cc", dest="cc", help="C compiler", metavar="CC")
+parser.add_option('-p', '--prefix', dest='prefix', help='Install prefix', metavar='PREFIX')
+parser.add_option('-d', '--dest', dest='dest', help='Install to this directory', metavar='DEST')
+parser.add_option('-c', '--cc', dest='cc', help='C compiler', metavar='CC')
+parser.add_option('-v', '--valac', dest='valac', help='Vala compiler', metavar='VALAC')
+parser.add_option('-n', '--nonnull', dest='nonnull', action="store_true", help='Enable compiletime checks for null pointers', metavar='NONNULL')
+
+parser.add_option('', '--valac-flags', dest='valac_flags', help='Vala compiler flags for all targets', metavar='VALAC_FLAGS', default='')
+for target in TARGETS:
+	parser.add_option('', '--valac-flags-' + target, dest='valac_flags_' + target, help='Vala compiler flags for ' + target, metavar='VALAC_FLAGS', default='')
+
+parser.add_option('', '--cflags', dest='cflags', help='C compiler flags for all targets', metavar='CFLAGS', default='')
+for target in TARGETS:
+	parser.add_option('', '--cflags-' + target, dest='cflags_' + target, help='C compiler flags for ' + target, metavar='CFLAGS', default='')
+
+parser.add_option('', '--ldflags', dest='ldflags', help='Linker flags for all targets', metavar='LDFLAGS', default='')
+for target in TARGETS:
+	parser.add_option('', '--ldflags-' + target, dest='ldflags_' + target, help='Linker flags for ' + target, metavar='LDFLAGS', default='')
 
 (options, args) = parser.parse_args()
+option_dict = vars(options)
 
+valacflags = dict()
+cflags = dict()
+ldflags = dict()
+
+for target in TARGETS:
+	cflags[target] = options.cflags
+	cflags[target] = cflags[target] + ' ' + option_dict.get('cflags_' + target, "")
+	cflags[target] = cflags[target].strip()
+
+	ldflags[target] = options.ldflags
+	ldflags[target] = ldflags[target] + ' ' + option_dict.get('ldflags_' + target, "")
+	ldflags[target] = ldflags[target].strip()
+	
+	valacflags[target] = options.valac_flags
+	valacflags[target] = valacflags[target] + ' ' + option_dict.get('valac_flags_' + target, "")
+	valacflags[target] = valacflags[target].strip()
+	
 if not options.prefix:
-	if "bsd" in sys.platform:
-		options.prefix = "${DESTDIR}${PREFIX}"
+	if 'bsd' in sys.platform:
+		options.prefix = '${DESTDIR}${PREFIX}'
 	else:
-		options.prefix = "/usr"
-
+		options.prefix = '/usr'
+		
+if not options.dest:
+	options.dest = ''
 if not options.cc:
-	options.cc = "gcc"
+	options.cc = 'gcc'
+if not options.valac:
+	options.valac = 'valac'
+if not options.nonnull:
+	options.nonnull = False
+else:
+	options.nonnull = True
+	
+configure()
 
-configure ()
-configfile.write_parameters (options.prefix, options.cc)	
+configfile.write_compile_parameters(options.prefix,
+									options.dest,
+									options.cc,
+									options.valac,
+									options.nonnull,
+									valacflags,
+									cflags,
+									ldflags)

@@ -1,94 +1,83 @@
-"""
-Copyright (C) 2012 2013 2014 2015 Eduardo Naufel Schettino and Johan Mattsson
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
-"""
-
 import os
 import glob
 import subprocess
 import sys
 
-from optparse import OptionParser
-from doit.tools import run_once
-from doit.action import CmdAction
-from scripts.bavala import Vala
 from scripts import version
 from scripts import config
-from scripts.run import run
-from scripts.pkgconfig import generate_pkg_config_file
-from scripts.tests import all_tests
-from scripts.tests import build_tests
+from scripts import tests
+from scripts.builder import Builder
 
 DOIT_CONFIG = {
     'default_tasks': [
         'libxmlbird',
-        'pkgconfig'
         ],
     }
 
-LIBXMLBIRD_LIBS = [
-    'glib-2.0'
-]
+all_tests = tests.all_tests ();
 
-valac_options = [
-	'--enable-experimental-non-null',
-	'--enable-experimental'
-	]
-
-tests = all_tests ();
-
-if "kfreebsd" in sys.platform:
-    LIBXMLBIRD_SO_VERSION=version.LIBXMLBIRD_SO_VERSION
-elif "bsd" in sys.platform:
-    LIBXMLBIRD_SO_VERSION='${LIBxmlbird_VERSION}'
-else:
-    LIBXMLBIRD_SO_VERSION=version.LIBXMLBIRD_SO_VERSION
+def soname(target_binary):
+    if "darwin" in sys.platform or "msys" in sys.platform:
+        return ''
+        
+    return '-Wl,-soname,' + target_binary
     
-libxmlbird = Vala(src='libxmlbird', build='build', library='xmlbird', so_version=LIBXMLBIRD_SO_VERSION, pkg_libs=LIBXMLBIRD_LIBS)
-def task_libxmlbird():
-    yield libxmlbird.gen_c(valac_options + ['--pkg posix'])
-    yield libxmlbird.gen_o(['-fPIC'])
-    yield libxmlbird.gen_so()
-    yield libxmlbird.gen_ln()
+def make_libxmlbird(target_binary):
+    valac_command = config.VALAC + """\
+        -C \
+        --pkg posix \
+        --vapidir=./ \
+        --basedir build/libxmlbird/ \
+        """ + config.NON_NULL + """ \
+        """ + config.VALACFLAGS.get("xmlbird", "") + """ \
+        --enable-experimental \
+        --library libxmlbird \
+        -H build/xmlbird/xmlbird.h \
+        libxmlbird/*.vala \
+        """
 
+    cc_command = config.CC + " " + config.CFLAGS.get("xmlbird", "") + """ \
+            -c C_SOURCE \
+            -fPIC \
+            $(pkg-config --cflags glib-2.0) \
+            -o OBJECT_FILE"""
+
+    linker_command = config.CC + " " + config.LDFLAGS.get("xmlbird", "") + """ \
+            -shared \
+            """ + soname(target_binary) + """ \
+            build/libxmlbird/*.o \
+            $(pkg-config --libs glib-2.0) \
+            -o ./build/bin/""" + target_binary
+
+    libxmlbird = Builder('libxmlbird',
+                          valac_command, 
+                          cc_command,
+                          linker_command,
+                          target_binary,
+                          'libxmlbird.so')
+			
+    yield libxmlbird.build()
+
+def task_libxmlbird():
+    if "kfreebsd" in sys.platform:
+        LIBXMLBIRD_SO_VERSION=version.LIBXMLBIRD_SO_VERSION
+    elif "openbsd" in sys.platform:
+        LIBXMLBIRD_SO_VERSION='${LIBxmlbird_VERSION}'
+    else:
+        LIBXMLBIRD_SO_VERSION=version.LIBXMLBIRD_SO_VERSION
+    
+    yield make_libxmlbird('libxmlbird.so.' + LIBXMLBIRD_SO_VERSION)
+    
+    
 def task_distclean ():
     return  {
         'actions': ['rm -rf .doit.db build scripts/config.py scripts/*.pyc dodo.pyc'],
         }
 
-def task_pkgconfig():
-    """generate a pkg-config file"""
-    return {
-	     'actions': [generate_pkg_config_file]
-    }
-
-def task_pkg_flags():
-    """get compiler flags for libs/pkgs """
-    for pkg in LIBXMLBIRD_LIBS:
-        cmd = 'pkg-config --cflags --libs {pkg}'
-
-        yield {
-            'name': pkg,
-            'actions': [CmdAction(cmd.format(pkg=pkg), save_out='out')],
-            'uptodate': [run_once],
-            }
-
 def task_build_tests():
     """build tests"""
     return {
-	     'actions': [build_tests],
+	     'actions': [tests.build_tests],
 	     'task_dep': ['libxmlbird'],
     }
 
@@ -106,14 +95,14 @@ def task_test():
         print('Running tests')
         failed = 0
         passed = 0
-        for t in tests:
+        for t in all_tests:
             process = subprocess.Popen ("./run_test.sh ./build/bin/" + t, shell=True)
             process.communicate()[0]
             if not process.returncode == 0:
-					 print(t + ' Failed')
-					 failed = failed + 1
+                    print(t + ' Failed')
+                    failed = failed + 1
             else:
-			       passed = passed + 1
+                    passed = passed + 1
 			       
         print(str(passed) + ' tests passed and ' + str(failed) + ' failed.')
 		   

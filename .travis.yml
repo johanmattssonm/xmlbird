@@ -6,6 +6,6 @@ before_install:
   - sudo apt-get install -qq libglib2.0-dev libgee-dev valac-0.22
 script:
   - python2 ./configure
-  - python2 ./scripts/build_linux.py
+  - python2 ./build.py
   - python2 ./scripts/build_tests.py 
   - python2 ./scripts/test.py 

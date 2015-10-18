@@ -164,12 +164,12 @@ public class Tag : GLib.Object {
 		XmlString attributes;
 		XmlString content;
 
+		end_tag_index = -1;
+		
 		if (error) {
 			return new Tag.empty ();
 		}
-
-		end_tag_index = -1;
-			
+	
 		if (start < 0) {
 			warn ("Negative index.");
 			error = true;

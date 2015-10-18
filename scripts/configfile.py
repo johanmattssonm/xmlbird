@@ -1,24 +1,19 @@
-#!/usr/bin/python
-"""
-Copyright (C) 2012, 2013 Eduardo Naufel Schettino and Johan Mattsson
+#!/usr/bin/python3
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+def write_compile_parameters (prefix, dest, cc, valac, non_null,
+                              valacflags, cflags, ldflags):
+    f = open('./scripts/config.py', 'w+')
+    f.write("#!/usr/bin/python3\n")
+    f.write("PREFIX =  \"" + prefix + "\"\n")
+    f.write("DEST = \"" + dest + "\"\n")
+    f.write("CC = \"" + cc + "\"\n")
+    f.write("VALAC = \"" + valac + "\"\n")
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
-"""
-
-def write_parameters (prefix, cc):
-	f = open('./scripts/config.py', 'w+')
-	f.write("#!/usr/bin/python\n")
-	f.write("PREFIX =  \"" + prefix + "\"\n")
-	f.write("CC = \"" + cc + "\"\n")
-	
+    if non_null:
+        f.write("NON_NULL = \"--enable-experimental-non-null\"\n")
+    else:
+        f.write("NON_NULL = \"\"\n")
+        
+    f.write("VALACFLAGS = " + str(valacflags) + "\n")
+    f.write("CFLAGS = " + str(cflags) + "\n")
+    f.write("LDFLAGS = " + str(ldflags) + "\n")
