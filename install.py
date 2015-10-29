@@ -89,8 +89,9 @@ if not options.libdir:
 else:
 	libdir = options.libdir
 
-
-if os.path.isfile ('build/bin/libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION):
+if "openbsd" in sys.platform:
+    install ('build/bin/libxmlbird.so.' + '${LIBxmlbird_VERSION}', '/lib', 644)
+elif os.path.isfile ('build/bin/libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION):
    install ('build/bin/libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION, libdir, 644)
    link (libdir, 'libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION, ' libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION_MAJOR)
    link (libdir, 'libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION, ' libxmlbird.so')
