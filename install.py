@@ -48,13 +48,13 @@ def install (file, dir, mode):
 	f = getDest (file, dir)
 	print ("install: " + f)
 	run ('install -d ' + dest + prefix + dir)
-	run ('install -m ' + str(mode) + ' '   + file + ' ' + dest + prefix + dir + '/')
+	run ('install -m ' + str(mode) + ' ' + file + ' ' + dest + prefix + dir + '/')
 
 def install_root (file, dir, mode):
 	f = getDestRoot (file, dir)
 	print ("install: " + f)
 	run ('install -d ' + dest + dir)
-	run ('install -m ' + str(mode) + ' '   + file + ' ' + dest + dir + '/')
+	run ('install -m ' + str(mode) + ' ' + file + ' ' + dest + dir + '/')
 
 def link (dir, file, linkname):
 	f = getDest (linkname, dir)
