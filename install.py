@@ -43,7 +43,7 @@ def getDestRoot (file, dir):
 	else:
 		f += file
 	return f
-	
+
 def install (file, dir, mode):
 	f = getDest (file, dir)
 	print ("install: " + f)
