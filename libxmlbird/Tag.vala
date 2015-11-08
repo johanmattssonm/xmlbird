@@ -226,7 +226,7 @@ public class Tag : GLib.Object {
 				
 				if (attributes.has_suffix ("/")) {
 					content = new XmlString ("", 0);
-					end_tag_index = data.index_of (">", index);
+					end_tag_index = find_end_of_tag (index);
 					data.get_next_ascii_char (ref end_tag_index, out c);
 				} else {
 					if (!data.get_next_ascii_char (ref end, out c)) {; // skip >
