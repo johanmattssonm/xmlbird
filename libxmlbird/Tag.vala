@@ -36,6 +36,8 @@ public class Tag : GLib.Object {
 	internal bool error = false;
 	internal int log_level = WARNINGS;
 
+	bool parsed = false;
+
 	internal Tag (XmlString name, XmlString attributes, XmlString content,
 		int log_level, XmlData entire_file) {
 		
@@ -44,9 +46,6 @@ public class Tag : GLib.Object {
 		this.name = name;
 		this.data = content;
 		this.attributes = attributes;
-		
-		reparse ();
-		reparse_attributes ();
 	}
 	
 	internal Tag.empty () {
@@ -78,6 +77,7 @@ public class Tag : GLib.Object {
 	public void reparse () {
 		tag_index = 0;
 		next_tag = obtain_next_tag ();
+		parsed = true;
 	}
 
 	internal void reparse_attributes () {
@@ -105,11 +105,21 @@ public class Tag : GLib.Object {
 	 * @return true if there is one more tags left
 	 */
 	internal bool has_more_tags () {
+		if (!parsed) {
+			reparse ();
+			reparse_attributes ();
+		}
+
 		return has_tags;
 	}
 	
 	/** @return the next tag. **/
 	internal Tag get_next_tag () {
+		if (!parsed) {
+			reparse ();
+			reparse_attributes ();
+		}
+		
 		Tag r = next_tag == null ? new Tag.empty () : (!) next_tag;
 		next_tag = obtain_next_tag ();
 		return r;
@@ -117,11 +127,21 @@ public class Tag : GLib.Object {
 
 	/** @return true is there is one or more attributes to obtain with get_next_attribute */
 	internal bool has_more_attributes () {
+		if (!parsed) {
+			reparse ();
+			reparse_attributes ();
+		}
+		
 		return has_attributes;
 	}
 	
 	/** @return next attribute. */
 	internal Attribute get_next_attribute () {
+		if (!parsed) {
+			reparse ();
+			reparse_attributes ();
+		}
+		
 		Attribute r = next_attribute == null ? new Attribute.empty () : (!) next_attribute;
 		next_attribute = obtain_next_attribute ();
 		return r;
@@ -262,14 +282,14 @@ public class Tag : GLib.Object {
 					
 					data.get_next_ascii_char (ref end_tag_index, out c);
 				}
-				
+					
 				return new Tag (name, attributes, content, log_level, entire_file);	
 			}
 		}
-		
+	
 		return new Tag.empty ();
 	}
-	
+
 	int find_next_separator (int start) {
 		int index = start;
 		int previous_index = start;
