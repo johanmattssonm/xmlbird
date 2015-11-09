@@ -55,11 +55,6 @@ internal class XmlData : XmlString {
 		for (int i = 0; i < tags_size; i++) {
 			new_index = start_tags[i];
 			if (new_index >= index) {
-				
-				if (new_index == 0 && i > 0) { //FIXME:DELETE
-					return -1;
-				}
-				
 				return new_index;
 			}
 		}

@@ -37,15 +37,18 @@ public class Tag : GLib.Object {
 	internal int log_level = WARNINGS;
 
 	bool parsed = false;
+	
+	Tag? parent = null;
 
 	internal Tag (XmlString name, XmlString attributes, XmlString content,
-		int log_level, XmlData entire_file) {
+		int log_level, XmlData entire_file, Tag? parent = null) {
 		
 		this.entire_file = entire_file;
 		this.log_level = log_level;
 		this.name = name;
 		this.data = content;
 		this.attributes = attributes;
+		this.parent = parent;
 	}
 	
 	internal Tag.empty () {
@@ -110,7 +113,7 @@ public class Tag : GLib.Object {
 			reparse_attributes ();
 		}
 
-		return has_tags;
+		return has_tags && !error;
 	}
 	
 	/** @return the next tag. **/
@@ -281,7 +284,7 @@ public class Tag : GLib.Object {
 					data.get_next_ascii_char (ref end_tag_index, out c);
 				}
 					
-				return new Tag (name, attributes, content, log_level, entire_file);	
+				return new Tag (name, attributes, content, log_level, entire_file, this);	
 			}
 		}
 	
@@ -558,18 +561,21 @@ public class Tag : GLib.Object {
 		}
 
 		public bool next () {
-			if (tag.error) { 
-				return false;
-			}
-			
 			if (tag.has_more_tags ()) {
 				next_tag = tag.get_next_tag ();
 			} else {
 				next_tag = null;
 			}
 
-			if (next_tag != null && ((!) next_tag).error) { 
+			if (unlikely (next_tag != null && ((!) next_tag).error)) {
 				next_tag = null;
+				tag.error = true;
+				
+				Tag t = tag;
+				while (t.parent != null) {
+					t = (!) t.parent;
+					t.error = true;	
+				}
 			}
 															
 			return next_tag != null;

@@ -110,23 +110,28 @@ public class XmlParser : GLib.Object {
 		return !error;
 	}
 	
-	void validate_tags (Tag tag) {
+	bool validate_tags (Tag tag) {
 		Attributes attributes = tag.get_attributes ();
 
 		foreach (Attribute a in attributes) {
 			if (tag.has_failed () || a.get_name_length () == 0) {
 				error = true;
-				return;
+				return false;
 			}
 		}
 		
 		foreach (Tag t in tag) {
-			if (tag.has_failed ()) {
+			if (t.has_failed ()) {
 				error = true;
-				return;
+				return false;
 			}
-			validate_tags (t);
-		}		
+			
+			if (!validate_tags (t)) {
+				return false;
+			}
+		}
+		
+		return true;		
 	}
 	
 	/** 
