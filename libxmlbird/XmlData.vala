@@ -44,7 +44,7 @@ internal class XmlData : XmlString {
 		int offset = (int) ((size_t) start.data - (size_t) data);
 		return offset;
 	}
-	
+		
 	public int find_next_tag_token (int index) {
 		int new_index;
 				

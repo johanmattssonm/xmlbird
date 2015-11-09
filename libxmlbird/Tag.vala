@@ -186,7 +186,9 @@ public class Tag : GLib.Object {
 		XmlString name;
 		XmlString attributes;
 		XmlString content;
-
+		
+		string tag_name;
+	
 		end_tag_index = -1;
 		
 		if (error) {
@@ -210,7 +212,7 @@ public class Tag : GLib.Object {
 			
 		while (data.get_next_ascii_char (ref index, out c)) {
 			if (c == '<') {
-				separator = find_next_separator (index);
+				separator = data.find_next_tag_separator (index);
 
 				if (separator < 0) {
 					error = true;
@@ -219,8 +221,9 @@ public class Tag : GLib.Object {
 				}
 
 				name = data.substring (index, separator - index);
+				tag_name = name.to_string ();
 				
-				if (name.to_string () == "") {
+				if (tag_name == "") {
 					warn ("A tag without a name.");
 					error = true;
 					return new Tag.empty ();
@@ -290,25 +293,6 @@ public class Tag : GLib.Object {
 	
 		return new Tag.empty ();
 	}
-
-	int find_next_separator (int start) {
-		int index = start;
-		int previous_index = start;
-		unichar c;
-		
-		while (true) {
-			previous_index = index;
-			if (!data.get_next_ascii_char (ref index, out c)) {
-				break;
-			}
-			
-			if (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '>' || c == '/') {
-				return previous_index;
-			}
-		}
-		
-		return -1;
-	}
 	
 	int find_end_of_tag (int start) {
 		int index;
@@ -359,6 +343,7 @@ public class Tag : GLib.Object {
 		unichar c, slash;
 		int start_count = 1;
 		int tag_start;
+		string tag_name;
 		
 		if (name.length == 0) {
 			error = true;
@@ -398,7 +383,16 @@ public class Tag : GLib.Object {
 				tag_start = index;
 				slash_index = index;
 				entire_file.get_next_ascii_char (ref slash_index, out slash);
-
+				
+				tag_name = parse_name (entire_file, tag_start);
+				
+				if (tag_name == "") {
+					warn (@"Tag without name.");
+					warn (@"Row: $(get_row (tag_start))");
+					error = true;
+					return -1;
+				}
+				
 				if (slash == '/' && is_tag (entire_file, name, slash_index)) {
 					if (start_count == 1) {
 						return previous_index;
@@ -418,6 +412,21 @@ public class Tag : GLib.Object {
 		warn (@"No closing tag for $(name.to_string ())");
 		
 		return -1;
+	}
+	
+	string parse_name (XmlData data, int index) {
+		if (data.substring (index).has_prefix("/")) {
+			index += "/".length;
+		}
+		
+		int separator = data.find_next_tag_separator (index);
+
+		if (!(0 <= separator < data.length)) {
+			warn("Tag without name.");
+			return "";
+		}
+
+		return data.substring (index, separator - index).to_string ();
 	}
 	
 	bool is_tag (XmlString tag, XmlString name, int start) {
