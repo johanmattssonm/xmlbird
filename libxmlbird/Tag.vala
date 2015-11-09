@@ -358,6 +358,7 @@ public class Tag : GLib.Object {
 		int previous_index;
 		unichar c, slash;
 		int start_count = 1;
+		int tag_start;
 		
 		if (name.length == 0) {
 			error = true;
@@ -394,6 +395,7 @@ public class Tag : GLib.Object {
 			}
 			
 			if (c == '<') {
+				tag_start = index;
 				slash_index = index;
 				entire_file.get_next_ascii_char (ref slash_index, out slash);
 
@@ -406,7 +408,7 @@ public class Tag : GLib.Object {
 							return previous_index;
 						}
 					}
-				} else if (is_tag (entire_file, name, slash_index - "/".length)) {
+				} else if (is_tag (entire_file, name, tag_start)) {
 					start_count++;
 				} 
 			}
