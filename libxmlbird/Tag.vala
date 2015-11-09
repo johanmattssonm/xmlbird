@@ -132,7 +132,7 @@ public class Tag : GLib.Object {
 			reparse_attributes ();
 		}
 		
-		return has_attributes;
+		return has_attributes && !error;
 	}
 	
 	/** @return next attribute. */
@@ -264,8 +264,6 @@ public class Tag : GLib.Object {
 					closing_tag = find_closing_tag (name, end);
 					
 					if (closing_tag == -1 || closing_tag >= data.length) {
-						print (data.to_string ());
-						print ("\n");
 						warn (@"No closing tag for $name");
 						error = true;
 						break;
@@ -451,7 +449,11 @@ public class Tag : GLib.Object {
 		int content_stop;
 		unichar quote;
 		unichar c;
-		
+	
+		if (error) {
+			return new Attribute.empty ();
+		}
+							
 		// skip space and other separators
 		while (true) {
 			previous_index = index;

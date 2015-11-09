@@ -28,7 +28,7 @@ def fuzz():
             i = i + 1
             bug_file = 'build/fuzzy_bug_' + str(i) + '.xml'
 
-        process = subprocess.Popen ('pwd && mv build/tests/fuzzy.xml ' + bug_file, shell=True)
+        process = subprocess.Popen ('mv build/tests/fuzzy.xml ' + bug_file, shell=True)
         process.communicate()[0]
         if not process.returncode == 0:
             print('Can not move ' + bug_file)
@@ -40,4 +40,6 @@ i = 0
 while True:
     print('Running fuzz tests ' + str(i))
     fuzz ()
+
+        	
     i = i + 1
