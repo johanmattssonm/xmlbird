@@ -33,7 +33,23 @@ public class Tag : GLib.Object {
 	Tag? next_tag = null;
 	Attribute? next_attribute = null;
 	
-	internal bool error = false;
+	internal bool error {
+		get {
+			return parser_error;
+		}
+		
+		set {
+			Tag t = this;
+			t.parser_error = value;	
+			
+			while (t.parent != null) {
+				t = (!) t.parent;
+				t.parser_error = value;	
+			}
+		}
+	}
+	bool parser_error = false;
+	
 	internal int log_level = WARNINGS;
 
 	bool parsed = false;
@@ -581,12 +597,6 @@ public class Tag : GLib.Object {
 			if (unlikely (next_tag != null && ((!) next_tag).error)) {
 				next_tag = null;
 				tag.error = true;
-				
-				Tag t = tag;
-				while (t.parent != null) {
-					t = (!) t.parent;
-					t.error = true;	
-				}
 			}
 															
 			return next_tag != null;

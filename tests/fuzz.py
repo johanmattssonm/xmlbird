@@ -38,7 +38,7 @@ def fuzz():
 
 i = 0
 while True:
-    print('Running fuzz tests ' + str(i))
+    print('Running fuzz test ' + str(i))
     fuzz ()
 
         	
