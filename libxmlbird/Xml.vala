@@ -174,6 +174,10 @@ public class XmlParser : GLib.Object {
 			content = data.substring (root_index);
 			container = new Tag (empty, empty, content, log_level, data);
 			root = container.get_next_tag ();
+			
+			if (container.has_failed ()) {
+				error = true;
+			}
 		}
 	}
 	
