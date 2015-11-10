@@ -40,6 +40,7 @@ public class Tag : GLib.Object {
 		
 		set {
 			Tag t = this;
+			
 			t.parser_error = value;	
 			
 			while (t.parent != null) {
@@ -48,9 +49,10 @@ public class Tag : GLib.Object {
 			}
 		}
 	}
-	bool parser_error = false;
 	
-	internal int log_level = WARNINGS;
+	bool parser_error;
+	
+	internal int log_level;
 
 	bool parsed = false;
 	
@@ -58,13 +60,17 @@ public class Tag : GLib.Object {
 
 	internal Tag (XmlString name, XmlString attributes, XmlString content,
 		int log_level, XmlData entire_file, Tag? parent = null) {
-		
+			
 		this.entire_file = entire_file;
 		this.log_level = log_level;
 		this.name = name;
 		this.data = content;
 		this.attributes = attributes;
 		this.parent = parent;
+		
+		if (parent != null) {
+			parser_error = ((!) parent).error;
+		}
 	}
 	
 	internal Tag.empty () {
@@ -72,7 +78,7 @@ public class Tag : GLib.Object {
 		data = new XmlString ("", 0);
 		attributes = new XmlString ("", 0);
 		name = new XmlString ("", 0);
-		error = true;
+		parser_error = true;
 	}
 	
 	/** 
@@ -364,7 +370,6 @@ public class Tag : GLib.Object {
 		if (unlikely (name.length == 0)) {
 			error = true;
 			warn ("No name for tag.");
-			error = true;
 			return -1;
 		}
 	
@@ -380,7 +385,7 @@ public class Tag : GLib.Object {
 			while (!entire_file.substring (index).has_prefix ("<")) {
 				index = entire_file.find_next_tag_token (index + 1);
 				
-				if (index == -1) {
+				if (unlikely (index == -1)) {
 					warn (@"No end tag for $(name).");
 					error = true;
 					return -1;

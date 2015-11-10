@@ -93,6 +93,8 @@ public class XmlParser : GLib.Object {
 	 * @return true if the xml document is valid xml.
 	 */
 	public bool validate () {
+		bool valid;
+		
 		if (this.data.error) {
 			error = true;
 			return false;
@@ -104,25 +106,25 @@ public class XmlParser : GLib.Object {
 			return false;
 		}
 		
-		validate_tags (root);
+		valid = validate_tags (root);
 			
 		reparse (NONE);
-		return !error;
+		return valid;
 	}
 	
 	bool validate_tags (Tag tag) {
 		Attributes attributes = tag.get_attributes ();
-
+		
+		tag.log_level = NONE;
+		
 		foreach (Attribute a in attributes) {
-			if (tag.has_failed () || a.get_name_length () == 0) {
-				error = true;
+			if (error || tag.has_failed () || a.get_name_length () == 0) {
 				return false;
 			}
 		}
 		
 		foreach (Tag t in tag) {
-			if (t.has_failed ()) {
-				error = true;
+			if (error || t.has_failed () || tag.has_failed ()) {
 				return false;
 			}
 			
@@ -130,7 +132,11 @@ public class XmlParser : GLib.Object {
 				return false;
 			}
 		}
-		
+
+		if (tag.has_failed ()) {
+			return false;
+		}
+				
 		return true;		
 	}
 	
