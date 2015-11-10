@@ -22,10 +22,14 @@ internal class XmlData : XmlString {
 	internal bool error = false;
 	
 	const char FIRST_BIT = 1 << 7;
+
+	internal int log_level = WARNINGS;
 	
-	public XmlData (char* data, int length) {
+	public XmlData (char* data, int length, int log_level) {
 		base (data, length);
 
+		this.log_level = log_level;
+		
 		start_tags = null;
 		tags_capacity = 0;
 		tags_size = 0;
@@ -66,16 +70,21 @@ internal class XmlData : XmlString {
 		int i = 0;
 		char* d = data;
  		char c;
+ 		bool tag_is_open = false;
  		
  		c = d[i];
  		
  		while (c != '\0') {
 			if ((int) (c & FIRST_BIT) == 0) {
 				
-				if (c == '"') {
+				if (tag_is_open && c == '"') {
 					i = skip_quote (d, i);
 					
-					if (i == -1) {
+					if (unlikely (i == -1)) {
+						if (log_level == WARNINGS) {
+							XmlParser.warning ("No end quote.");
+						}
+						
 						error = true;
 						break;
 					}
@@ -83,6 +92,11 @@ internal class XmlData : XmlString {
 				
 				if (c == '<') {
 					add_tag (i);
+					tag_is_open = true;
+				}
+				
+				if (c == '>') {
+					tag_is_open = false;
 				}
 			}
 			
@@ -97,7 +111,10 @@ internal class XmlData : XmlString {
  		c = data[i];
  		
 		if (unlikely (c != '"')) {
-			warning ("Not a quote.");
+			if (log_level == WARNINGS) {
+				XmlParser.warning ("Not a quote.");
+			}
+
 			error = true;
 			return i + 1;
 		}
@@ -133,7 +150,7 @@ internal class XmlData : XmlString {
 		tags_capacity += 512;
 		tags = (int*) try_malloc (tags_capacity * sizeof (int));
 		
-		if (tags == null) {
+		if (unlikely (tags == null)) {
 			tags_capacity = 0;
 			
 			if (start_tags != null) {
@@ -142,8 +159,11 @@ internal class XmlData : XmlString {
 				tags_size = 0;
 				error = true;
 			}
+
+			if (log_level == WARNINGS) {
+				XmlParser.warning ("Can not allocate xml data buffer.");
+			}
 			
-			warning ("Can not allocate xml data buffer.");
 			return false;
 		}
 		

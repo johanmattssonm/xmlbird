@@ -9,6 +9,9 @@ public static int main (string[] arg) {
 
 	t = new B.Test ("""<a><!-- Comment --><b /></a>""");
 	t.test ("a b");
-			
+
+	t = new B.Test ("""<root><quote>"<a attr="b" />"</quote></root>""");
+	t.test ("root quote a attr b");
+				
 	return 0;
 }

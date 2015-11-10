@@ -68,7 +68,7 @@ public class Tag : GLib.Object {
 	}
 	
 	internal Tag.empty () {
-		entire_file = new XmlData ("", 0);
+		entire_file = new XmlData ("", 0, NONE);
 		data = new XmlString ("", 0);
 		attributes = new XmlString ("", 0);
 		name = new XmlString ("", 0);
@@ -375,13 +375,13 @@ public class Tag : GLib.Object {
 			error = true;
 			return -1;
 		}
-		
+
 		while (true) {
 			while (!entire_file.substring (index).has_prefix ("<")) {
 				index = entire_file.find_next_tag_token (index + 1);
 				
 				if (index == -1) {
-					warn (@"No end tag for $(name)");
+					warn (@"No end tag for $(name).");
 					error = true;
 					return -1;
 				}
@@ -431,8 +431,11 @@ public class Tag : GLib.Object {
 	}
 	
 	string parse_name (XmlData data, int index) {
+		int slash_offset = 0;
+		
 		if (data.substring (index).has_prefix("/")) {
-			index += "/".length;
+			slash_offset = "/".length;
+			index += slash_offset;
 		}
 		
 		int separator = data.find_next_tag_separator (index);
@@ -442,7 +445,7 @@ public class Tag : GLib.Object {
 			return "";
 		}
 
-		return data.substring (index, separator - index).to_string ();
+		return data.substring (index - slash_offset, separator - index + slash_offset).to_string ();
 	}
 	
 	bool is_tag (XmlString tag, XmlString name, int start) {

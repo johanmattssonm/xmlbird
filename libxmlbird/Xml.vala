@@ -84,7 +84,7 @@ public class XmlParser : GLib.Object {
 	 */
 	public XmlParser (string data) {
 		this.input = data;
-		this.data = new XmlData (data, data.length);		
+		this.data = new XmlData (data, data.length, NONE);		
 		reparse (NONE);
 	}
 		
@@ -154,6 +154,8 @@ public class XmlParser : GLib.Object {
 		
 		error = false;
 		empty = new XmlString ("", 0);
+		
+		data.log_level = log_level;
 		
 		root_index = find_root_tag ();
 		if (root_index == -1) {
