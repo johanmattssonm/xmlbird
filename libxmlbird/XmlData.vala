@@ -48,7 +48,7 @@ internal class XmlData : XmlString {
 		int offset = (int) ((size_t) start.data - (size_t) data);
 		return offset;
 	}
-		
+	
 	public int find_next_tag_token (int index) {
 		int new_index;
 				
@@ -56,14 +56,34 @@ internal class XmlData : XmlString {
 			return -1;
 		}
 		
-		for (int i = 0; i < tags_size; i++) {
-			new_index = start_tags[i];
-			if (new_index >= index) {
-				return new_index;
+		int lower = 0;
+		int upper = tags_size;
+		int i = lower + (upper - lower) / 2;
+
+		while (true) {
+			if (i == 0 && start_tags[i] >= index) {
+				new_index = start_tags[i];
+				break;
+			} else if (start_tags[i] >= index && start_tags[i - 1] < index) {
+				new_index = start_tags[i];
+				break;
 			}
+			
+			if (lower >= upper) {
+				new_index = -1;
+				break;
+			}
+
+			if (start_tags[i] < index) {
+				lower = i + 1;
+			} else {
+				upper = i - 1;
+			}
+			
+			i = lower + (upper - lower) / 2;
 		}
-		
-		return -1;
+
+		return new_index;
 	}
 
 	void index_start_tags () {
@@ -81,7 +101,7 @@ internal class XmlData : XmlString {
 					i = skip_quote (d, i);
 					
 					if (unlikely (i == -1)) {
-						if (log_level == WARNINGS) {
+						if (unlikely (log_level == WARNINGS)) {
 							XmlParser.warning ("No end quote.");
 						}
 						
@@ -111,7 +131,7 @@ internal class XmlData : XmlString {
  		c = data[i];
  		
 		if (unlikely (c != '"')) {
-			if (log_level == WARNINGS) {
+			if (unlikely (log_level == WARNINGS)) {
 				XmlParser.warning ("Not a quote.");
 			}
 
@@ -160,7 +180,7 @@ internal class XmlData : XmlString {
 				error = true;
 			}
 
-			if (log_level == WARNINGS) {
+			if (unlikely (log_level == WARNINGS)) {
 				XmlParser.warning ("Can not allocate xml data buffer.");
 			}
 			

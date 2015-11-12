@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014 Johan Mattsson
+    Copyright (C) 2014 2015 Johan Mattsson
 
     This library is free software; you can redistribute it and/or modify 
     it under the terms of the GNU Lesser General Public License as 
@@ -82,7 +82,7 @@ public class Tag : GLib.Object {
 	}
 	
 	/** 
-	 * Get tag attributes for this tag. 
+	 * Get attributes for this tag. 
 	 * @return a container with all the attributes
 	 */
 	public Attributes get_attributes () {
