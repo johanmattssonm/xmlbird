@@ -111,15 +111,35 @@ public class Tag : GLib.Object {
 	}
 	
 	/** 
-	 * Obtain the name of the tag.
+	 * Get the name of the tag.
 	 * @return the name of this tag. 
 	 */ 
 	public string get_name () {
-		return name.to_string ();
+		string name = name.to_string ();
+		int namespace_separator = name.index_of (":");
+		
+		if (namespace_separator == -1) {
+			return name;
+		}
+		
+		return name.substring (0, namespace_separator);
 	}
 
+	/** @return namespace for this tag. */
+	public string get_namespace () {
+		string name = name.to_string ();
+		int namespace_separator = name.index_of (":");
+		
+		if (namespace_separator == -1) {
+			return "";
+		}
+		
+		return name.substring (namespace_separator + 1);
+	}
+
+
 	/** 
-	 * Obtain tag content.
+	 * Get tag content.
 	 * @return data between the start and end tags.
 	 */
 	public string get_content () {
@@ -542,7 +562,6 @@ public class Tag : GLib.Object {
 					error = true;
 					warn (@"Expecting equal sign for attribute $(attribute_name).");
 					warn (@"Row: $(get_row (((size_t) attributes.data) + index))");
-					
 					return new Attribute.empty ();
 				}
 			}

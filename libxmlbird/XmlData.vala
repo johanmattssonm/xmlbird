@@ -101,7 +101,7 @@ internal class XmlData : XmlString {
 					i = skip_quote (d, i);
 					
 					if (unlikely (i == -1)) {
-						if (unlikely (log_level == WARNINGS)) {
+						if (log_level == WARNINGS) {
 							XmlParser.warning ("No end quote.");
 						}
 						
@@ -131,7 +131,7 @@ internal class XmlData : XmlString {
  		c = data[i];
  		
 		if (unlikely (c != '"')) {
-			if (unlikely (log_level == WARNINGS)) {
+			if (log_level == WARNINGS) {
 				XmlParser.warning ("Not a quote.");
 			}
 
@@ -180,7 +180,7 @@ internal class XmlData : XmlString {
 				error = true;
 			}
 
-			if (unlikely (log_level == WARNINGS)) {
+			if (log_level == WARNINGS) {
 				XmlParser.warning ("Can not allocate xml data buffer.");
 			}
 			

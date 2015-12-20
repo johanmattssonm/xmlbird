@@ -28,6 +28,11 @@ internal class XmlString : GLib.Object {
 		this.length = length;
 	}
 
+	internal XmlString.empty () {
+		this.data = "";
+		this.length = 0;
+	}
+	
 	internal int find_next_tag_separator (int start) {
 		int index = start;
 		int previous_index = start;
