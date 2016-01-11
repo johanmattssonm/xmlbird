@@ -50,7 +50,11 @@ public class XmlElement : GLib.Object {
 	}
 	
 	public Attributes get_attributes () {
-		return new Attributes.for_element (attributes);
+		if (attributes == null) {
+			return new Attributes.for_element (new Elements ());
+		}
+		
+		return new Attributes.for_element ((!) attributes);
 	}
 	
 	internal void remove_parent () {
