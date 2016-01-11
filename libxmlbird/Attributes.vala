@@ -17,7 +17,6 @@ namespace B {
  * Iterator for XML attributes. 
  */
 public class Attributes : GLib.Object {
-	
 	Tag? tag = null;
 	Elements? elements = null;
 	

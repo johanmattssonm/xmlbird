@@ -33,14 +33,21 @@ public class XmlElement : GLib.Object {
 		name = tag.get_name ();
 		xml_namespace = tag.get_namespace ();
 		this.parent = parent;
-		
-		leaf = !tag.has_more_tags ();
+
+		children = parse_tags (tag);
+		attributes = parse_attributes (tag);
+
+		leaf = children == null;
 		
 		if (leaf) {
 			content = tag.get_content ();
-		} else {
-			children = parse_tags (tag);
 		}
+	}
+
+	internal XmlElement.attribute (Attribute attribute) {
+		name = attribute.get_name ();
+		xml_namespace = attribute.get_namespace ();
+		content = attribute.get_content ();
 	}
 	
 	~XmlElement () {
@@ -61,16 +68,35 @@ public class XmlElement : GLib.Object {
 		parent = null;
 	}
 	
-	internal Elements parse_tags (Tag tag) {
+	internal Elements? parse_tags (Tag tag) {
 		Elements elements = new Elements ();
 		
 		foreach (Tag t in tag) {
 			elements.add (new XmlElement (this, t));
 		}
-		
+
+		if (elements.size == 0) {
+			return null;
+		}
+
 		return elements;
 	}
-	
+
+	internal Elements? parse_attributes (Tag tag) {
+		Attributes tag_attributes = tag.get_attributes ();
+		Elements elements = new Elements ();
+
+		foreach (Attribute a in tag_attributes) {
+			elements.add (new XmlElement.attribute (a));
+		}
+		
+		if (elements.size == 0) {
+			return null;
+		}
+
+		return elements;	
+	}
+
 	/** Get a reference to the parent element. This method will return 
 	 * null if the parent element has been deleted, if the method is called
 	 * on the root element or if the method is called on an attribute.
@@ -82,6 +108,10 @@ public class XmlElement : GLib.Object {
 		
 		XmlElement e = (!) parent;
 		return e;
+	}
+	
+	public bool is_leaf () {
+		return leaf;
 	}
 	
 	public string get_name () {
