@@ -114,18 +114,6 @@ public class Tag : GLib.Object {
 	 * Get the name of the tag.
 	 * @return the name of this tag. 
 	 */ 
-	public string get_name () {
-		string name = name.to_string ();
-		int namespace_separator = name.index_of (":");
-		
-		if (namespace_separator == -1) {
-			return name;
-		}
-		
-		return name.substring (0, namespace_separator);
-	}
-
-	/** @return namespace for this tag. */
 	public string get_namespace () {
 		string name = name.to_string ();
 		int namespace_separator = name.index_of (":");
@@ -134,7 +122,19 @@ public class Tag : GLib.Object {
 			return "";
 		}
 		
-		return name.substring (namespace_separator + 1);
+		return name.substring (0, namespace_separator);
+	}
+
+	/** @return namespace for this tag. */
+	public string get_name () {
+		string name = name.to_string ();
+		int namespace_separator = name.index_of (":");
+		
+		if (namespace_separator == -1) {
+			return name;
+		}
+		
+		return name.substring (namespace_separator + ":".length);
 	}
 
 
