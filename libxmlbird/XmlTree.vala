@@ -34,6 +34,10 @@ public class XmlTree : GLib.Object {
 		
 		root_element = new XmlElement (null, parser.get_root_tag ());
 	}
+
+	public XmlTree.for_tag (Tag root) {
+		this.root_element = new XmlElement (null, root);
+	}
 	
 	public XmlElement get_root () {
 		return root_element;

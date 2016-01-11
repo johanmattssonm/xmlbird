@@ -52,6 +52,7 @@ internal class Elements : GLib.Object {
 		}
 		
 		data[size] = element;
+		element.ref ();
 		size++;
 	}
 
