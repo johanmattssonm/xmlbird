@@ -17,19 +17,32 @@ namespace B {
  * Representation of one XML attribute.
  */
 public class Attribute : GLib.Object {
-	
 	XmlString ns;
 	XmlString name;
 	XmlString content;
 
+	string? element_ns = null;
+	string? element_name = null;
+	string? element_content = null;
+	
 	internal Attribute (XmlString ns, XmlString name, XmlString content) {
 		this.ns = ns;
 		this.name = name;
 		this.content = content;
 	}
 
+	internal Attribute.element (XmlElement element) {
+		element_ns = element.get_namespace ();
+		element_name = element.get_name ();
+		element_content = element.get_content ();
+		
+		ns = new XmlString ((!) element_ns, ((!) element_ns).length);
+		name = new XmlString ((!) element_name, ((!) element_name).length);
+		content = new XmlString ((!) element_content, ((!) element_content).length);
+	}
+
 	internal Attribute.empty () {
-		this.ns = new XmlString ("", 0);
+		this.ns = new XmlString("", 0);
 		this.name = new XmlString ("", 0);
 		this.content = new XmlString ("", 0);
 	}

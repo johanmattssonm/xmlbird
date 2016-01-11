@@ -27,7 +27,7 @@ internal class XmlString : GLib.Object {
 		this.data = data;
 		this.length = length;
 	}
-
+	
 	internal XmlString.empty () {
 		this.data = "";
 		this.length = 0;
