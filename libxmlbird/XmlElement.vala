@@ -26,7 +26,7 @@ public class XmlElement : GLib.Object {
 	Elements? children = null;
 	Elements? attributes = null;
 	
-	internal XmlElement.empty () {
+	public XmlElement.empty () {
 	}
 	
 	internal XmlElement (XmlElement? parent, Tag tag) {
