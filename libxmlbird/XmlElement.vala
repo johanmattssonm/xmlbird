@@ -15,7 +15,7 @@
 namespace B {
 
 /**
- * A representation of a tags and content in an XML document.
+ * Representation of tags and content in an XML document.
  */
 public class XmlElement : GLib.Object {
 	string name = "";
