@@ -62,7 +62,6 @@ def link (dir, file, linkname):
 	run ('cd ' + dest + prefix + dir + ' && ln -sf ' + file + ' ' + linkname)
 
 parser = OptionParser()
-parser.add_option ("-l", "--libdir", dest="libdir", help="path to directory for shared libraries (lib or lib64).")
 parser.add_option ("-d", "--dest", dest="dest", help="install to this directory", metavar="DEST")
 
 (options, args) = parser.parse_args()
@@ -73,26 +72,9 @@ if not options.dest:
 prefix = config.PREFIX
 dest = options.dest
 
-if sys.platform == 'darwin':
-	libdir = '/lib'
-elif not options.libdir:	
-	if platform.dist()[0] == 'Ubuntu' or platform.dist()[0] == 'Debian':
-		process = subprocess.Popen(['dpkg-architecture', '-qDEB_HOST_MULTIARCH'], stdout=subprocess.PIPE)
-		out, err = process.communicate()
-		libdir = '/lib/' + out.decode('UTF-8').rstrip ('\n')
-	else:
-		p = platform.machine()
-		if p == 'i386' or p == 's390' or p == 'ppc' or p == 'armv7hl':
-			libdir = '/lib'
-		elif p == 'x86_64' or p == 's390x' or p == 'ppc64':
-			libdir = '/lib64'
-		else:
-			libdir = '/lib'
-else:
-	libdir = options.libdir
-
+libdir = config.LIBDIR
 if "openbsd" in sys.platform:
-	install ('build/bin/libxmlbird.so.' + '${LIBxmlbird_VERSION}', '/lib', 644)
+	install ('build/bin/libxmlbird.so.' + '${LIBxmlbird_VERSION}', libdir, 644)
 elif os.path.isfile ('build/bin/libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION):
 	install ('build/bin/libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION, libdir, 644)
 	link (libdir, 'libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION, ' libxmlbird.so')

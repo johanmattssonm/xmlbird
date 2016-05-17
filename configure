@@ -51,6 +51,7 @@ def configure(valac):
 
 parser = OptionParser()
 parser.add_option('-p', '--prefix', dest='prefix', help='Install prefix', metavar='PREFIX')
+parser.add_option('-l', '--libdir', dest='libdir', help='path to directory for shared libraries (lib or lib64).', metavar='LIBDIR')
 parser.add_option('-d', '--dest', dest='dest', help='Install to this directory', metavar='DEST')
 parser.add_option('-c', '--cc', dest='cc', help='C compiler', metavar='CC')
 parser.add_option('-v', '--valac', dest='valac', help='Vala compiler', metavar='VALAC')
@@ -93,7 +94,24 @@ if not options.prefix:
 		options.prefix = '${DESTDIR}${PREFIX}'
 	else:
 		options.prefix = '/usr'
-		
+
+if not options.libdir:
+	if sys.platform == 'darwin':
+		options.libdir = '/lib'
+	elif platform.dist()[0] == 'Ubuntu' or platform.dist()[0] == 'Debian':
+		process = subprocess.Popen(['dpkg-architecture', '-qDEB_HOST_MULTIARCH'], stdout=subprocess.PIPE)
+		out, err = process.communicate()
+		options.libdir = 'lib/' + out.decode('UTF-8').rstrip('\n')
+	else:
+		p = platform.machine()
+		if p == 'i386' or p == 's390' or p == 'ppc' or p == 'armv7hl':
+			options.libdir = 'lib'
+		elif p == 'x86_64' or p == 's390x' or p == 'ppc64':
+			options.libdir = 'lib64'
+		else:
+			options.libdir = 'lib'
+options.libdir = '/' + options.libdir.lstrip('/')
+
 if not options.dest:
 	options.dest = ''
 if not options.cc:
@@ -108,6 +126,7 @@ else:
 configure(options.valac)
 
 configfile.write_compile_parameters(options.prefix,
+									options.libdir,
 									options.dest,
 									options.cc,
 									options.valac,
