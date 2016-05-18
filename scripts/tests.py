@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import subprocess
-from scripts.config import PREFIX
+from scripts.config import (PREFIX, VALAC)
 from scripts.run import run
 from scripts.version import LIBXMLBIRD_SO_VERSION
 
@@ -32,7 +32,7 @@ def build_tests():
     run ("mkdir -p build/tests");
 
     for test in tests:
-        run ("valac --ccode --pkg=posix --pkg=xmlbird --vapidir=./build "
+        run (VALAC + " --ccode --pkg=posix --pkg=xmlbird --vapidir=./build "
              + "--directory=./build tests/" + test + ".vala tests/Test.vala");
 
         run ("""gcc -fPIC -c \
