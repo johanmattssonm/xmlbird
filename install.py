@@ -48,13 +48,13 @@ def install (file, dir, mode):
 	f = getDest (file, dir)
 	print ("install: " + f)
 	run ('install -d ' + dest + prefix + dir)
-	run ('install -m ' + `mode` + ' '   + file + ' ' + dest + prefix + dir + '/')
+	run ('install -m ' + str(mode) + ' '   + file + ' ' + dest + prefix + dir + '/')
 
 def install_root (file, dir, mode):
    f = getDestRoot (file, dir)
    print ("install: " + f)
    run ('install -d ' + dest + dir)
-   run ('install -m ' + `mode` + ' '   + file + ' ' + dest + dir + '/')
+   run ('install -m ' + str(mode) + ' '   + file + ' ' + dest + dir + '/')
 
 def link (dir, file, linkname):
 	f = getDest (linkname, dir)
@@ -73,7 +73,9 @@ if not options.dest:
 prefix = config.PREFIX
 dest = options.dest
 
-if not options.libdir:	
+if sys.platform == 'darwin':
+	libdir = '/lib'
+elif not options.libdir:	
 	if platform.dist()[0] == 'Ubuntu' or platform.dist()[0] == 'Debian':
 		process = subprocess.Popen(['dpkg-architecture', '-qDEB_HOST_MULTIARCH'], stdout=subprocess.PIPE)
 		out, err = process.communicate()
@@ -98,12 +100,12 @@ elif os.path.isfile ('build/libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION):
    install ('build/libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION, libdir, 644)
    link (libdir, 'libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION, ' libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION_MAJOR)
    link (libdir, 'libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION, ' libxmlbird.so')
-elif os.path.isfile ('build/bin/libxmlbird.' + version.LIBXMLBIRD_SO_VERSION + '.dylib'):
-   install ('build/bin/libxmlbird-' + version.LIBXMLBIRD_SO_VERSION + '.dylib', libdir, 644)
-   link (libdir, 'libxmlbird-' + version.LIBXMLBIRD_SO_VERSION + '.dylib', ' libxmlbird.dylib.' + version.LIBXMLBIRD_SO_VERSION_MAJOR)
-   link (libdir, 'libxmlbird-' + version.LIBXMLBIRD_SO_VERSION + '.dylib', ' libxmlbird.dylib')
+elif os.path.isfile ('build/bin/libxmlbird-' + version.LIBXMLBIRD_SO_VERSION_MAJOR + '.dylib'):
+   install ('build/bin/libxmlbird-' + version.LIBXMLBIRD_SO_VERSION_MAJOR + '.dylib', libdir, 644)
+   link (libdir, 'libxmlbird-' + version.LIBXMLBIRD_SO_VERSION_MAJOR + '.dylib', ' libxmlbird.dylib.' + version.LIBXMLBIRD_SO_VERSION_MAJOR)
+   link (libdir, 'libxmlbird-' + version.LIBXMLBIRD_SO_VERSION_MAJOR + '.dylib', ' libxmlbird.dylib')
 else:
-   print ("Can't find libxmlbird.")
+   print("Can't find libxmlbird, so-version: " + str(version.LIBXMLBIRD_SO_VERSION))
    exit (1)
 
 install ('build/xmlbird/xmlbird.h', '/include', 644)

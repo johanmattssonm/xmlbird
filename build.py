@@ -11,8 +11,8 @@ from scripts import tests
 if platform == 'msys':
 	process_tasks(dodo.make_libxmlbird('libbirdgems.dll', []))
 elif platform == 'darwin':
-	lib = "libxmlbird." + str(version.LIBXMLBIRD_SO_VERSION_MAJOR) + '.dylib'
-	process_tasks(dodo.make_libxmlbird(lib, []))
+	lib = "libxmlbird-" + str(version.LIBXMLBIRD_SO_VERSION_MAJOR) + '.dylib'
+	process_tasks(dodo.make_libxmlbird(lib))
 elif "openbsd" in platform:
 	process_tasks(dodo.make_libxmlbird('libxmlbird.so.${LIBxmlbird_VERSION}'))
 else:
