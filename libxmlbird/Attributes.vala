@@ -17,40 +17,77 @@ namespace B {
  * Iterator for XML attributes. 
  */
 public class Attributes : GLib.Object {
+	Tag? tag = null;
+	Elements? elements = null;
 	
-	Tag tag;
-		
 	internal Attributes (Tag t) {
 		tag = t;
 	}
-	
+
+	internal Attributes.for_element (Elements elements) {
+		this.elements = elements;
+	}
+		
 	public Iterator iterator () {
-		return new Iterator (tag);
+		if (tag != null) {
+			return new Iterator (tag);
+		}
+		
+		return new Iterator.for_elements (elements);
 	}
 
 	public class Iterator : GLib.Object {
-		Tag tag;
-		Attribute? next_attribute;
+		Tag? tag = null;
+		Attribute? next_attribute = null;
+		Elements elements = null;
+		int index = 0;
 		
 		internal Iterator (Tag t) {
 			tag = t;
-			next_attribute = null;
 			tag.reparse_attributes ();
 		}
 
+		internal Iterator.for_elements (Elements elements) {
+			this.elements = elements;
+		}
+
 		public bool next () {
+			if (tag != null) {
+				return next_tag ((!) tag);
+			}
+			
+			if (elements != null) {
+				return next_element ((!) elements);
+			}
+			
+			return false;
+		}
+
+		internal bool next_tag (Tag tag) {
 			if (tag.has_more_attributes ()) {
 				next_attribute = tag.get_next_attribute ();
 			} else {
 				next_attribute = null;
 			}
 			
-			return next_attribute != null;
+			return next_attribute != null;			
 		}
 
+		internal bool next_element (Elements elements) {
+			if (index < elements.size) {
+				XmlElement e = elements.get_element (index);
+				next_attribute = new Attribute.element (e);
+				index++;
+			} else {
+				next_attribute = null;
+			}
+			
+			return next_attribute != null;			
+		}
+		
 		public new Attribute get () {
 			if (next_attribute == null) {
-				XmlParser.warning ("No attribute is parsed yet.");
+				XmlParser.warning ("No attribute available.");
 				return new Attribute.empty ();
 			}
 			

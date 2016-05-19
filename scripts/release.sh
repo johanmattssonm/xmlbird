@@ -9,6 +9,20 @@ cd export
 
 version=$(cat ../../scripts/version.py | grep "XMLBIRD_VERSION = '" | sed -e "s:XMLBIRD_VERSION = '::" | sed "s:'.*::g")
 
+if ! git diff --exit-code > /dev/null; then
+        echo "Uncommitted changes, commit before creating the release."
+        exit 1
+fi
+
+git tag -a v$version -m "Version $version"
+
+if [ $? -ne 0 ] ; then
+        echo "Can't create release tag"
+        exit 1
+fi
+
+echo "Creating a release fo version $version"
+
 rm -rf libxmlbird-$version
 
 git clone --depth 1 --no-hardlinks --local $rep

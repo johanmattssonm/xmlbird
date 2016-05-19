@@ -27,7 +27,31 @@ internal class XmlString : GLib.Object {
 		this.data = data;
 		this.length = length;
 	}
-
+	
+	internal XmlString.empty () {
+		this.data = "";
+		this.length = 0;
+	}
+	
+	internal int find_next_tag_separator (int start) {
+		int index = start;
+		int previous_index = start;
+		unichar c;
+		
+		while (true) {
+			previous_index = index;
+			if (!get_next_ascii_char (ref index, out c)) {
+				break;
+			}
+			
+			if (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '>' || c == '/') {
+				return previous_index;
+			}
+		}
+		
+		return -1;
+	}
+	
 	internal int index_of (string needle, int offset = 0) {
 		int len = length;
 		int needle_len = needle.length;
@@ -102,7 +126,7 @@ internal class XmlString : GLib.Object {
  			return false;
  		}
  		
-		if (likely ((int) (d[i] & first_bit) == 0)) {
+		if ((int) (d[i] & first_bit) == 0) {
 			c = d[i];
 			index++;
 			return c != '\0';

@@ -22,10 +22,14 @@ internal class XmlData : XmlString {
 	internal bool error = false;
 	
 	const char FIRST_BIT = 1 << 7;
+
+	internal int log_level = WARNINGS;
 	
-	public XmlData (char* data, int length) {
+	public XmlData (char* data, int length, int log_level) {
 		base (data, length);
 
+		this.log_level = log_level;
+		
 		start_tags = null;
 		tags_capacity = 0;
 		tags_size = 0;
@@ -52,35 +56,55 @@ internal class XmlData : XmlString {
 			return -1;
 		}
 		
-		for (int i = 0; i < tags_size; i++) {
-			new_index = start_tags[i];
-			if (new_index >= index) {
-				
-				if (new_index == 0 && i > 0) { //FIXME:DELETE
-					return -1;
-				}
-				
-				return new_index;
+		int lower = 0;
+		int upper = tags_size;
+		int i = lower + (upper - lower) / 2;
+
+		while (true) {
+			if (i == 0 && start_tags[i] >= index) {
+				new_index = start_tags[i];
+				break;
+			} else if (start_tags[i] >= index && start_tags[i - 1] < index) {
+				new_index = start_tags[i];
+				break;
 			}
+			
+			if (lower >= upper) {
+				new_index = -1;
+				break;
+			}
+
+			if (start_tags[i] < index) {
+				lower = i + 1;
+			} else {
+				upper = i - 1;
+			}
+			
+			i = lower + (upper - lower) / 2;
 		}
-		
-		return -1;
+
+		return new_index;
 	}
 
 	void index_start_tags () {
 		int i = 0;
 		char* d = data;
  		char c;
+ 		bool tag_is_open = false;
  		
  		c = d[i];
  		
  		while (c != '\0') {
 			if ((int) (c & FIRST_BIT) == 0) {
 				
-				if (c == '"') {
+				if (tag_is_open && c == '"') {
 					i = skip_quote (d, i);
 					
-					if (i == -1) {
+					if (unlikely (i == -1)) {
+						if (log_level == WARNINGS) {
+							XmlParser.warning ("No end quote.");
+						}
+						
 						error = true;
 						break;
 					}
@@ -88,6 +112,11 @@ internal class XmlData : XmlString {
 				
 				if (c == '<') {
 					add_tag (i);
+					tag_is_open = true;
+				}
+				
+				if (c == '>') {
+					tag_is_open = false;
 				}
 			}
 			
@@ -102,7 +131,10 @@ internal class XmlData : XmlString {
  		c = data[i];
  		
 		if (unlikely (c != '"')) {
-			warning ("Not a quote.");
+			if (log_level == WARNINGS) {
+				XmlParser.warning ("Not a quote.");
+			}
+
 			error = true;
 			return i + 1;
 		}
@@ -138,7 +170,7 @@ internal class XmlData : XmlString {
 		tags_capacity += 512;
 		tags = (int*) try_malloc (tags_capacity * sizeof (int));
 		
-		if (tags == null) {
+		if (unlikely (tags == null)) {
 			tags_capacity = 0;
 			
 			if (start_tags != null) {
@@ -147,8 +179,11 @@ internal class XmlData : XmlString {
 				tags_size = 0;
 				error = true;
 			}
+
+			if (log_level == WARNINGS) {
+				XmlParser.warning ("Can not allocate xml data buffer.");
+			}
 			
-			warning ("Can not allocate xml data buffer.");
 			return false;
 		}
 		

@@ -12,6 +12,7 @@ from scripts.builder import Builder
 DOIT_CONFIG = {
     'default_tasks': [
         'libxmlbird',
+	'libxmlbird_pkgconfig'
         ],
     }
 

@@ -1,4 +1,4 @@
-#!/usr/bin/python 
+#!/usr/bin/python3
 """
 Copyright (C) 2013 2014 2015 Johan Mattsson
 
@@ -43,24 +43,24 @@ def getDestRoot (file, dir):
 	else:
 		f += file
 	return f
-	
+
 def install (file, dir, mode):
 	f = getDest (file, dir)
 	print ("install: " + f)
 	run ('install -d ' + dest + prefix + dir)
-	run ('install -m ' + str(mode) + ' '   + file + ' ' + dest + prefix + dir + '/')
+	run ('install -m ' + str(mode) + ' ' + file + ' ' + dest + prefix + dir + '/')
 
 def install_root (file, dir, mode):
-   f = getDestRoot (file, dir)
-   print ("install: " + f)
-   run ('install -d ' + dest + dir)
-   run ('install -m ' + str(mode) + ' '   + file + ' ' + dest + dir + '/')
+	f = getDestRoot (file, dir)
+	print ("install: " + f)
+	run ('install -d ' + dest + dir)
+	run ('install -m ' + str(mode) + ' ' + file + ' ' + dest + dir + '/')
 
 def link (dir, file, linkname):
 	f = getDest (linkname, dir)
 	print ("install link: " + f)
 	run ('cd ' + dest + prefix + dir + ' && ln -sf ' + file + ' ' + linkname)
-	
+
 parser = OptionParser()
 parser.add_option ("-l", "--libdir", dest="libdir", help="path to directory for shared libraries (lib or lib64).")
 parser.add_option ("-d", "--dest", dest="dest", help="install to this directory", metavar="DEST")
@@ -79,7 +79,7 @@ elif not options.libdir:
 	if platform.dist()[0] == 'Ubuntu' or platform.dist()[0] == 'Debian':
 		process = subprocess.Popen(['dpkg-architecture', '-qDEB_HOST_MULTIARCH'], stdout=subprocess.PIPE)
 		out, err = process.communicate()
-		libdir = '/lib/' + out.rstrip ('\n')
+		libdir = '/lib/' + out.decode('UTF-8').rstrip ('\n')
 	else:
 		p = platform.machine()
 		if p == 'i386' or p == 's390' or p == 'ppc' or p == 'armv7hl':
@@ -91,11 +91,12 @@ elif not options.libdir:
 else:
 	libdir = options.libdir
 
-
-if os.path.isfile ('build/bin/libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION):
-   install ('build/bin/libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION, libdir, 644)
-   link (libdir, 'libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION, ' libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION_MAJOR)
-   link (libdir, 'libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION, ' libxmlbird.so')
+if "openbsd" in sys.platform:
+	install ('build/bin/libxmlbird.so.' + '${LIBxmlbird_VERSION}', '/lib', 644)
+elif os.path.isfile ('build/bin/libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION):
+	install ('build/bin/libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION, libdir, 644)
+	link (libdir, 'libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION, ' libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION_MAJOR)
+	link (libdir, 'libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION, ' libxmlbird.so')
 elif os.path.isfile ('build/libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION):
    install ('build/libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION, libdir, 644)
    link (libdir, 'libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION, ' libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION_MAJOR)
@@ -111,4 +112,3 @@ else:
 install ('build/xmlbird/xmlbird.h', '/include', 644)
 install ('build/xmlbird.vapi', '/share/vala/vapi', 644)
 install ('build/xmlbird.pc', libdir + '/pkgconfig', 644)
-

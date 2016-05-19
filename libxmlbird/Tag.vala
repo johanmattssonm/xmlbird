@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014 Johan Mattsson
+    Copyright (C) 2014 2015 Johan Mattsson
 
     This library is free software; you can redistribute it and/or modify 
     it under the terms of the GNU Lesser General Public License as 
@@ -33,32 +33,56 @@ public class Tag : GLib.Object {
 	Tag? next_tag = null;
 	Attribute? next_attribute = null;
 	
-	internal bool error = false;
-	internal int log_level = WARNINGS;
+	internal bool error {
+		get {
+			return parser_error;
+		}
+		
+		set {
+			Tag t = this;
+			
+			t.parser_error = value;	
+			
+			while (t.parent != null) {
+				t = (!) t.parent;
+				t.parser_error = value;	
+			}
+		}
+	}
+	
+	bool parser_error;
+	
+	internal int log_level;
+
+	bool parsed = false;
+	
+	Tag? parent = null;
 
 	internal Tag (XmlString name, XmlString attributes, XmlString content,
-		int log_level, XmlData entire_file) {
-		
+		int log_level, XmlData entire_file, Tag? parent = null) {
+			
 		this.entire_file = entire_file;
 		this.log_level = log_level;
 		this.name = name;
 		this.data = content;
 		this.attributes = attributes;
+		this.parent = parent;
 		
-		reparse ();
-		reparse_attributes ();
+		if (parent != null) {
+			parser_error = ((!) parent).error;
+		}
 	}
 	
 	internal Tag.empty () {
-		entire_file = new XmlData ("", 0);
+		entire_file = new XmlData ("", 0, NONE);
 		data = new XmlString ("", 0);
 		attributes = new XmlString ("", 0);
 		name = new XmlString ("", 0);
-		error = true;
+		parser_error = true;
 	}
 	
 	/** 
-	 * Get tag attributes for this tag. 
+	 * Get attributes for this tag. 
 	 * @return a container with all the attributes
 	 */
 	public Attributes get_attributes () {
@@ -78,6 +102,7 @@ public class Tag : GLib.Object {
 	public void reparse () {
 		tag_index = 0;
 		next_tag = obtain_next_tag ();
+		parsed = true;
 	}
 
 	internal void reparse_attributes () {
@@ -86,15 +111,35 @@ public class Tag : GLib.Object {
 	}
 	
 	/** 
-	 * Obtain the name of the tag.
+	 * Get the name of the tag.
 	 * @return the name of this tag. 
 	 */ 
-	public string get_name () {
-		return name.to_string ();
+	public string get_namespace () {
+		string name = name.to_string ();
+		int namespace_separator = name.index_of (":");
+		
+		if (namespace_separator == -1) {
+			return "";
+		}
+		
+		return name.substring (0, namespace_separator);
 	}
 
+	/** @return namespace for this tag. */
+	public string get_name () {
+		string name = name.to_string ();
+		int namespace_separator = name.index_of (":");
+		
+		if (namespace_separator == -1) {
+			return name;
+		}
+		
+		return name.substring (namespace_separator + ":".length);
+	}
+
+
 	/** 
-	 * Obtain tag content.
+	 * Get tag content.
 	 * @return data between the start and end tags.
 	 */
 	public string get_content () {
@@ -105,11 +150,21 @@ public class Tag : GLib.Object {
 	 * @return true if there is one more tags left
 	 */
 	internal bool has_more_tags () {
-		return has_tags;
+		if (!parsed) {
+			reparse ();
+			reparse_attributes ();
+		}
+
+		return has_tags && !error;
 	}
 	
 	/** @return the next tag. **/
 	internal Tag get_next_tag () {
+		if (!parsed) {
+			reparse ();
+			reparse_attributes ();
+		}
+		
 		Tag r = next_tag == null ? new Tag.empty () : (!) next_tag;
 		next_tag = obtain_next_tag ();
 		return r;
@@ -117,11 +172,21 @@ public class Tag : GLib.Object {
 
 	/** @return true is there is one or more attributes to obtain with get_next_attribute */
 	internal bool has_more_attributes () {
-		return has_attributes;
+		if (!parsed) {
+			reparse ();
+			reparse_attributes ();
+		}
+		
+		return has_attributes && !error;
 	}
 	
 	/** @return next attribute. */
 	internal Attribute get_next_attribute () {
+		if (!parsed) {
+			reparse ();
+			reparse_attributes ();
+		}
+		
 		Attribute r = next_attribute == null ? new Attribute.empty () : (!) next_attribute;
 		next_attribute = obtain_next_attribute ();
 		return r;
@@ -163,14 +228,16 @@ public class Tag : GLib.Object {
 		XmlString name;
 		XmlString attributes;
 		XmlString content;
-
+		
+		string tag_name;
+	
 		end_tag_index = -1;
 		
 		if (error) {
 			return new Tag.empty ();
 		}
 	
-		if (start < 0) {
+		if (unlikely (start < 0)) {
 			warn ("Negative index.");
 			error = true;
 			return new Tag.empty ();
@@ -179,7 +246,7 @@ public class Tag : GLib.Object {
 		index = start;
 
 		d = data;
-		if (d == null) {
+		if (unlikely (d == null)) {
 			warn ("No data in xml string.");
 			error = true;
 			return new Tag.empty ();
@@ -187,17 +254,18 @@ public class Tag : GLib.Object {
 			
 		while (data.get_next_ascii_char (ref index, out c)) {
 			if (c == '<') {
-				separator = find_next_separator (index);
+				separator = data.find_next_tag_separator (index);
 
-				if (separator < 0) {
+				if (unlikely (separator < 0)) {
 					error = true;
 					warn ("Expecting a separator.");
 					return new Tag.empty ();
 				}
 
 				name = data.substring (index, separator - index);
+				tag_name = name.to_string ();
 				
-				if (name.to_string () == "") {
+				if (unlikely (tag_name == "")) {
 					warn ("A tag without a name.");
 					error = true;
 					return new Tag.empty ();
@@ -207,7 +275,7 @@ public class Tag : GLib.Object {
 					continue;
 				}
 
-				if (name.has_prefix ("/")) {
+				if (unlikely (name.has_prefix ("/"))) {
 					warn ("Expecting a new tag. Found a closing tag.");
 					error = true;
 					return new Tag.empty ();
@@ -216,7 +284,7 @@ public class Tag : GLib.Object {
 				// skip attributes
 				end = find_end_of_tag (separator); 
 								
-				if (end == -1) {
+				if (unlikely (end == -1)) {
 					error = true;
 					warn ("Expecting >.");
 					return new Tag.empty ();
@@ -226,10 +294,10 @@ public class Tag : GLib.Object {
 				
 				if (attributes.has_suffix ("/")) {
 					content = new XmlString ("", 0);
-					end_tag_index = data.index_of (">", index);
+					end_tag_index = find_end_of_tag (index);
 					data.get_next_ascii_char (ref end_tag_index, out c);
 				} else {
-					if (!data.get_next_ascii_char (ref end, out c)) {; // skip >
+					if (unlikely (!data.get_next_ascii_char (ref end, out c))) {; // skip >
 						warn ("Unexpected end of data.");
 						error = true;
 						break;
@@ -243,9 +311,7 @@ public class Tag : GLib.Object {
 					
 					closing_tag = find_closing_tag (name, end);
 					
-					if (closing_tag == -1 || closing_tag >= data.length) {
-						print (data.to_string ());
-						print ("\n");
+					if (unlikely (closing_tag == -1 || closing_tag >= data.length)) {
 						warn (@"No closing tag for $name");
 						error = true;
 						break;
@@ -254,7 +320,7 @@ public class Tag : GLib.Object {
 					content = data.substring (end, closing_tag - end);
 					end_tag_index = find_end_of_tag (closing_tag);
 									
-					if (end_tag_index == -1) {
+					if (unlikely (end_tag_index == -1)) {
 						error = true;
 						warn ("Expecting > for the closing tag.");
 						return new Tag.empty ();
@@ -262,31 +328,12 @@ public class Tag : GLib.Object {
 					
 					data.get_next_ascii_char (ref end_tag_index, out c);
 				}
-				
-				return new Tag (name, attributes, content, log_level, entire_file);	
+					
+				return new Tag (name, attributes, content, log_level, entire_file, this);	
 			}
 		}
-		
-		return new Tag.empty ();
-	}
 	
-	int find_next_separator (int start) {
-		int index = start;
-		int previous_index = start;
-		unichar c;
-		
-		while (true) {
-			previous_index = index;
-			if (!data.get_next_ascii_char (ref index, out c)) {
-				break;
-			}
-			
-			if (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '>' || c == '/') {
-				return previous_index;
-			}
-		}
-		
-		return -1;
+		return new Tag.empty ();
 	}
 	
 	int find_end_of_tag (int start) {
@@ -323,7 +370,7 @@ public class Tag : GLib.Object {
 	int find_end_quote (int start) {
 		int i = data.index_of ("\"", start);
 		
-		if (i == -1) {
+		if (unlikely (i == -1)) {
 			warn ("Expecting end quote.");
 			error = true;
 		}
@@ -337,28 +384,29 @@ public class Tag : GLib.Object {
 		int previous_index;
 		unichar c, slash;
 		int start_count = 1;
+		int tag_start;
+		string tag_name;
 		
-		if (name.length == 0) {
+		if (unlikely (name.length == 0)) {
 			error = true;
 			warn ("No name for tag.");
-			error = true;
 			return -1;
 		}
 	
 		index = entire_file.get_index (data) + start;
 		
-		if (index >= entire_file.length) {
+		if (unlikely (index >= entire_file.length)) {
 			warn ("Unexpected end of file");
 			error = true;
 			return -1;
 		}
-		
+
 		while (true) {
 			while (!entire_file.substring (index).has_prefix ("<")) {
 				index = entire_file.find_next_tag_token (index + 1);
 				
-				if (index == -1) {
-					warn (@"No end tag for $(name)");
+				if (unlikely (index == -1)) {
+					warn (@"No end tag for $(name).");
 					error = true;
 					return -1;
 				}
@@ -366,16 +414,26 @@ public class Tag : GLib.Object {
 
 			previous_index = index - entire_file.get_index (data);
 			
-			if (!entire_file.get_next_ascii_char (ref index, out c)) {
+			if (unlikely (!entire_file.get_next_ascii_char (ref index, out c))) {
 				warn ("Unexpected end of file");
 				error = true;
 				break;
 			}
 			
 			if (c == '<') {
+				tag_start = index;
 				slash_index = index;
 				entire_file.get_next_ascii_char (ref slash_index, out slash);
-
+				
+				tag_name = parse_name (entire_file, tag_start);
+				
+				if (unlikely (tag_name == "")) {
+					warn (@"Tag without name.");
+					warn (@"Row: $(get_row (tag_start))");
+					error = true;
+					return -1;
+				}
+				
 				if (slash == '/' && is_tag (entire_file, name, slash_index)) {
 					if (start_count == 1) {
 						return previous_index;
@@ -385,7 +443,7 @@ public class Tag : GLib.Object {
 							return previous_index;
 						}
 					}
-				} else if (is_tag (entire_file, name, slash_index - "/".length)) {
+				} else if (is_tag (entire_file, name, tag_start)) {
 					start_count++;
 				} 
 			}
@@ -395,6 +453,24 @@ public class Tag : GLib.Object {
 		warn (@"No closing tag for $(name.to_string ())");
 		
 		return -1;
+	}
+	
+	string parse_name (XmlData data, int index) {
+		int slash_offset = 0;
+		
+		if (data.substring (index).has_prefix("/")) {
+			slash_offset = "/".length;
+			index += slash_offset;
+		}
+		
+		int separator = data.find_next_tag_separator (index);
+
+		if (unlikely (!(0 <= separator < data.length))) {
+			warn("Tag without name.");
+			return "";
+		}
+
+		return data.substring (index - slash_offset, separator - index + slash_offset).to_string ();
 	}
 	
 	bool is_tag (XmlString tag, XmlString name, int start) {
@@ -431,7 +507,11 @@ public class Tag : GLib.Object {
 		int content_stop;
 		unichar quote;
 		unichar c;
-		
+	
+		if (error) {
+			return new Attribute.empty ();
+		}
+							
 		// skip space and other separators
 		while (true) {
 			previous_index = index;
@@ -475,14 +555,13 @@ public class Tag : GLib.Object {
 		// equal sign and space around it
 		while (attributes.get_next_ascii_char (ref index, out c)) {
 			if (!(c == ' ' || c == '\t' || c == '\n' || c == '\r')) {
-				if (c == '=') {
+				if (likely (c == '=')) {
 					break;
 				} else {
 					has_attributes = false;
 					error = true;
 					warn (@"Expecting equal sign for attribute $(attribute_name).");
 					warn (@"Row: $(get_row (((size_t) attributes.data) + index))");
-					
 					return new Attribute.empty ();
 				}
 			}
@@ -490,7 +569,7 @@ public class Tag : GLib.Object {
 		
 		while (attributes.get_next_ascii_char (ref index, out c)) {
 			if (!(c == ' ' || c == '\t' || c == '\n' || c == '\r')) {
-				if (c == '"' || c == '\'') {
+				if (likely (c == '"' || c == '\'')) {
 					break;
 				} else {
 					has_attributes = false;
@@ -505,7 +584,7 @@ public class Tag : GLib.Object {
 		content_start = index;
 		
 		while (true) {
-			if (!attributes.get_next_ascii_char (ref index, out c)) {
+			if (unlikely (!attributes.get_next_ascii_char (ref index, out c))) {
 				has_attributes = false;
 				error = true;
 				warn (@"Expecting end quote for attribute $(attribute_name).");
@@ -536,25 +615,22 @@ public class Tag : GLib.Object {
 		}
 
 		public bool next () {
-			if (tag.error) { 
-				return false;
-			}
-			
 			if (tag.has_more_tags ()) {
 				next_tag = tag.get_next_tag ();
 			} else {
 				next_tag = null;
 			}
 
-			if (next_tag != null && ((!) next_tag).error) { 
+			if (unlikely (next_tag != null && ((!) next_tag).error)) {
 				next_tag = null;
+				tag.error = true;
 			}
 															
 			return next_tag != null;
 		}
 
 		public new Tag get () {
-			if (next_tag == null) {
+			if (unlikely (next_tag == null)) {
 				XmlParser.warning ("No tag is parsed yet.");
 				return new Tag.empty ();
 			}

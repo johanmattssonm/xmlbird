@@ -84,7 +84,7 @@ public class XmlParser : GLib.Object {
 	 */
 	public XmlParser (string data) {
 		this.input = data;
-		this.data = new XmlData (data, data.length);		
+		this.data = new XmlData (data, data.length, NONE);		
 		reparse (NONE);
 	}
 		
@@ -93,6 +93,8 @@ public class XmlParser : GLib.Object {
 	 * @return true if the xml document is valid xml.
 	 */
 	public bool validate () {
+		bool valid;
+		
 		if (this.data.error) {
 			error = true;
 			return false;
@@ -104,29 +106,38 @@ public class XmlParser : GLib.Object {
 			return false;
 		}
 		
-		validate_tags (root);
+		valid = validate_tags (root);
 			
 		reparse (NONE);
-		return !error;
+		return valid;
 	}
 	
-	void validate_tags (Tag tag) {
+	bool validate_tags (Tag tag) {
 		Attributes attributes = tag.get_attributes ();
-
+		
+		tag.log_level = NONE;
+		
 		foreach (Attribute a in attributes) {
-			if (tag.has_failed () || a.get_name_length () == 0) {
-				error = true;
-				return;
+			if (error || tag.has_failed () || a.get_name_length () == 0) {
+				return false;
 			}
 		}
 		
 		foreach (Tag t in tag) {
-			if (tag.has_failed ()) {
-				error = true;
-				return;
+			if (error || t.has_failed () || tag.has_failed ()) {
+				return false;
 			}
-			validate_tags (t);
-		}		
+			
+			if (!validate_tags (t)) {
+				return false;
+			}
+		}
+
+		if (tag.has_failed ()) {
+			return false;
+		}
+				
+		return true;		
 	}
 	
 	/** 
@@ -150,6 +161,8 @@ public class XmlParser : GLib.Object {
 		error = false;
 		empty = new XmlString ("", 0);
 		
+		data.log_level = log_level;
+		
 		root_index = find_root_tag ();
 		if (root_index == -1) {
 			if (log_level == WARNINGS) {
@@ -161,6 +174,10 @@ public class XmlParser : GLib.Object {
 			content = data.substring (root_index);
 			container = new Tag (empty, empty, content, log_level, data);
 			root = container.get_next_tag ();
+			
+			if (container.has_failed ()) {
+				error = true;
+			}
 		}
 	}
 	
