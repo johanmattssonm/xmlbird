@@ -51,6 +51,7 @@ def make_libxmlbird(target_binary):
             """ + soname(target_binary) + """ \
             build/libxmlbird/*.o \
             $(pkg-config --libs glib-2.0) \
+            $(pkg-config --libs gobject-2.0) \
             -o ./build/bin/""" + target_binary
 
     libxmlbird = Builder('libxmlbird',

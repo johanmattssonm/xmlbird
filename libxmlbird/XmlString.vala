@@ -126,7 +126,7 @@ internal class XmlString : GLib.Object {
  			return false;
  		}
  		
-		if (likely ((int) (d[i] & first_bit) == 0)) {
+		if ((int) (d[i] & first_bit) == 0) {
 			c = d[i];
 			index++;
 			return c != '\0';

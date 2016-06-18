@@ -15,7 +15,7 @@
 namespace B {
 
 /**
- * A representation of an XML tree.
+ * A representation of a XML tree.
  * 
  * All XML elements are owned by the tree and will be deleted when the 
  * tree is deleted.
