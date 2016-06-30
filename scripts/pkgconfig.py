@@ -13,4 +13,5 @@ Description: XML parser
 Version: """ + version.XMLBIRD_VERSION + """
 Cflags: -I${includedir}
 Libs: -L${libdir} -lxmlbird
+Requires: glib-2.0
 """)
