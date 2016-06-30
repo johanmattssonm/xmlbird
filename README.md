@@ -6,7 +6,7 @@ XML Bird is an XML parser for programs written in Vala or C.
 
     Author: Johan Mattsson
     License: LGPL v3
-    Webpage: http://birdfont.org/xmlbird.php
+    Webpage: https://birdfont.org/xmlbird.php
 
 [![Build Status](https://travis-ci.org/johanmattssonm/xmlbird.svg?branch=master)]
 (https://travis-ci.org/johanmattssonm/xmlbird)
@@ -77,7 +77,7 @@ There is a test suite with benchmarks. Run “doit test”.
 
 XML Bird is a part of the [Birdfont][birdfont] project.
 
-[xmlbird]: http://birdfont.org/images/xmlbird-icon.png "XML Bird icon"
-[birdfont]: http://birdfont.org/ "Birdfont – Font Editor"
+[xmlbird]: https://birdfont.org/images/xmlbird-icon.png "XML Bird icon"
+[birdfont]: https://birdfont.org/ "Birdfont – Font Editor"
 
 

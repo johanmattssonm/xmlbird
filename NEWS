@@ -2,12 +2,12 @@ xmlbird (1.2.1) stable;
 
   * Create empty XML elements
 
- -- Johan Mattsson <johan.mattsson.m@gmail.com  Fri Jan 15 11:58:38 CET 2016
+ -- Johan Mattsson <johan.mattsson.m@gmail.com>  Fri Jan 15 11:58:38 CET 2016
 
 xmlbird (1.0.7) stable;
 
   * Bugfixes
   * New build system
 
- -- Johan Mattsson <johan.mattsson.m@gmail.com  Wed Oct 28 12:17:08 CET 2015
+ -- Johan Mattsson <johan.mattsson.m@gmail.com>  Wed Oct 28 12:17:08 CET 2015
 
