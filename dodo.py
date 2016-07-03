@@ -85,7 +85,7 @@ def task_libxmlbird_pkgconfig():
     
 def task_distclean ():
     return  {
-        'actions': ['rm -rf .doit.db build scripts/config.py scripts/*.pyc dodo.pyc'],
+        'actions': ['rm -rf .doit.db build scripts/config.py scripts/*.pyc *.pyc'],
         }
 
 def task_build_tests():

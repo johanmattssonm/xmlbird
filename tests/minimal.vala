@@ -12,6 +12,9 @@ public static int main (string[] arg) {
 
 	t = new B.Test ("""<root><quote>"<a attr="b" />"</quote></root>""");
 	t.test ("root quote a attr b");
+
+	t = new B.Test ("""<single />""");
+	t.test ("single");
 				
 	return 0;
 }
