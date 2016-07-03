@@ -1,3 +1,4 @@
+
 public static int main (string[] arg) {
 	B.Test t;
 	
@@ -13,8 +14,11 @@ public static int main (string[] arg) {
 	t = new B.Test ("""<root><quote>"<a attr="b" />"</quote></root>""");
 	t.test ("root quote a attr b");
 
-	t = new B.Test ("""<single />""");
+	t = new B.Test ("""<single/>""");
 	t.test ("single");
-				
+
+	t = new B.Test ("""<single_space />""");
+	t.test ("single_space");
+	
 	return 0;
 }

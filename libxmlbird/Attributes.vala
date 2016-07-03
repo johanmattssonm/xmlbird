@@ -30,21 +30,25 @@ public class Attributes : GLib.Object {
 		
 	public Iterator iterator () {
 		if (tag != null) {
-			return new Iterator (tag);
+			return new Iterator ((!) tag);
 		}
 		
-		return new Iterator.for_elements (elements);
+		if (elements != null) {
+			return new Iterator.for_elements ((!) elements);
+		}
+		
+		return new Iterator.for_elements (new Elements ());
 	}
 
 	public class Iterator : GLib.Object {
 		Tag? tag = null;
 		Attribute? next_attribute = null;
-		Elements elements = null;
+		Elements? elements = null;
 		int index = 0;
 		
 		internal Iterator (Tag t) {
 			tag = t;
-			tag.reparse_attributes ();
+			t.reparse_attributes ();
 		}
 
 		internal Iterator.for_elements (Elements elements) {

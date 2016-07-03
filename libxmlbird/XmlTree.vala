@@ -23,11 +23,13 @@ namespace B {
 public class XmlTree : GLib.Object {
 	
 	XmlElement root_element = new XmlElement.empty ();
+	bool valid = true;
 	
 	public XmlTree (string xml) {
 		XmlParser parser = new XmlParser (xml);
 
 		if (!parser.validate ()) {
+			valid = false;
 			XmlParser.warning ("Invalid XML.");
 			return;
 		}
@@ -41,6 +43,10 @@ public class XmlTree : GLib.Object {
 	
 	public XmlElement get_root () {
 		return root_element;
+	}
+	
+	public bool validate () {
+		return valid;
 	}
 }
 

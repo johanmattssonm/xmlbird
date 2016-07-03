@@ -14,7 +14,7 @@
 namespace B {
 
 class Test : GLib.Object {
-	XmlParser parser;
+	XmlTree parser;
 	string data;
 	
 	public Test (string xml_data) {
@@ -22,7 +22,7 @@ class Test : GLib.Object {
 	}
 	
 	public bool validate () {
-		parser = new XmlParser (data);
+		parser = new XmlTree (data);
 		return parser.validate ();
 	}
 	
@@ -49,18 +49,18 @@ class Test : GLib.Object {
 	}
 	
 	public string get_content () {
-		Tag root;
+		XmlElement root;
 		StringBuilder content;
 		
-		parser = new XmlParser (data);
+		parser = new XmlTree (data);
 		content = new StringBuilder ();
-		root = parser.get_root_tag ();
+		root = parser.get_root ();
 		add_tag (content, root);
 		
 		return content.str.strip ();
 	}
 
-	void add_tag (StringBuilder content, Tag tag) {
+	void add_tag (StringBuilder content, XmlElement tag) {
 		content.append (tag.get_name ());
 		content.append (" ");
 		
@@ -76,13 +76,13 @@ class Test : GLib.Object {
 			content.append (" ");
 		}
 		
-		foreach (Tag t in tag) {
+		foreach (XmlElement t in tag) {
 			add_tag (content, t);
 		}
 	}
 	
-	bool has_children (Tag tag) {
-		foreach (Tag t in tag) {
+	bool has_children (XmlElement tag) {
+		foreach (XmlElement t in tag) {
 			return true;
 		}
 		
