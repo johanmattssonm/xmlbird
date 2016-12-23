@@ -6,6 +6,7 @@ import time;
 from optparse import OptionParser
 from scripts import configfile
 import re
+import platform
 
 from scripts.run import run
 
