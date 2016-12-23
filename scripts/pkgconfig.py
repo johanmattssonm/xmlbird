@@ -6,7 +6,7 @@ def generate_pkg_config_file():
         f.write("prefix=" + config.PREFIX + "\n")
         f.write("""exec_prefix=${prefix}
 includedir=${prefix}/include
-libdir=${exec_prefix}/lib
+libdir=${exec_prefix}""" + config.LIBDIR + """
 
 Name: xmlbird
 Description: XML parser
