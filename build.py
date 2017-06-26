@@ -9,7 +9,7 @@ from scripts import version
 from scripts import tests
 
 if platform == 'msys':
-	process_tasks(dodo.make_libxmlbird('libbirdgems.dll', []))
+	process_tasks(dodo.make_libxmlbird('libxmlbird.dll'))
 elif platform == 'darwin':
 	lib = "libxmlbird-" + str(version.LIBXMLBIRD_SO_VERSION_MAJOR) + '.dylib'
 	process_tasks(dodo.make_libxmlbird(lib))
