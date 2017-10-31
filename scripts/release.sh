@@ -44,7 +44,7 @@ mv libxmlbird-$version.tar.xz ../
 # build it to make sure that everything was checked in
 cd libxmlbird-$version && \
 ./configure && \
-doit && \
+./build.py && \
 gpg --output ../../libxmlbird-$version.tar.xz.sig --detach-sig ../../libxmlbird-$version.tar.xz && \
 cd .. && \
 rm -rf ../export/libxmlbird-$version
