@@ -233,11 +233,11 @@ public class XmlParser : GLib.Object {
 	 */
 	public static string encode (string s) {
 		string t;
+		t = t.replace ("&", "&amp;");
 		t = s.replace ("\"", "&quot;");
 		t = t.replace ("'", "&apos;");
 		t = t.replace ("<", "&lt;");
 		t = t.replace (">", "&gt;");
-		t = t.replace ("&", "&amp;");
 		return t;
 	}
 
