@@ -20,5 +20,14 @@ public static int main (string[] arg) {
 	t = new B.Test ("""<single_space />""");
 	t.test ("single_space");
 	
+	string needs_encoding = "\"'<>&";
+	string encoded = B.XmlParser.encode (needs_encoding);
+	string decoded = B.XmlParser.decode (encoded);
+	
+	if (needs_encoding != decoded) {
+		print (@"Xml encoding failed:$needs_encoding != $decoded\n");
+		assert (false);
+	}
+
 	return 0;
 }
