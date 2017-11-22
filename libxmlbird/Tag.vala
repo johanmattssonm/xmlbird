@@ -402,14 +402,18 @@ public class Tag : GLib.Object {
 		}
 
 		while (true) {
-			while (!entire_file.substring (index).has_prefix ("<")) {
-				index = entire_file.find_next_tag_token (index + 1);
-				
-				if (unlikely (index == -1)) {
-					warn (@"No end tag for $(name).");
+			while (true) {
+				if (unlikely (index >= entire_file.length || index == -1)) {
+					warn (@"No end tag for $(name), end of file. index: $index");
 					error = true;
 					return -1;
+				}	
+
+				if (entire_file.substring (index).has_prefix ("<")) {
+					break;
 				}
+				
+				index = entire_file.find_next_tag_token (index + 1);
 			}
 
 			previous_index = index - entire_file.get_index (data);

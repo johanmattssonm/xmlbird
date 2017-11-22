@@ -1,3 +1,4 @@
+using B;
 
 public static int main (string[] arg) {
 	B.Test t;
@@ -21,13 +22,19 @@ public static int main (string[] arg) {
 	t.test ("single_space");
 	
 	string needs_encoding = "\"'<>&";
-	string encoded = B.XmlParser.encode (needs_encoding);
-	string decoded = B.XmlParser.decode (encoded);
-	
+	string encoded = XmlParser.encode (needs_encoding);
+	string decoded = XmlParser.decode (encoded);
+
 	if (needs_encoding != decoded) {
+		print (@"Xml encoding failed:$encoded\n");
 		print (@"Xml encoding failed:$needs_encoding != $decoded\n");
 		assert (false);
+	} else {
+		print (@"Xml encoding passed: $needs_encoding == $decoded\n");
 	}
+	
+	XmlParser parser = new XmlParser ("<tag1><tag1><tag2/></tag1>");
+	assert (!parser.validate ());
 
 	return 0;
 }
