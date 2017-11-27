@@ -26,15 +26,18 @@ public static int main (string[] arg) {
 	string decoded = XmlParser.decode (encoded);
 
 	if (needs_encoding != decoded) {
-		print (@"Xml encoding failed:$encoded\n");
 		print (@"Xml encoding failed:$needs_encoding != $decoded\n");
 		assert (false);
 	} else {
 		print (@"Xml encoding passed: $needs_encoding == $decoded\n");
 	}
 	
-	XmlParser parser = new XmlParser ("<tag1><tag1><tag2/></tag1>");
+	XmlParser parser;
+	parser = new XmlParser ("<tag1><tag1><tag2/></tag1>");
 	assert (!parser.validate ());
 
+	parser = new XmlParser ("<root>");
+	assert (!parser.validate ());
+	
 	return 0;
 }
