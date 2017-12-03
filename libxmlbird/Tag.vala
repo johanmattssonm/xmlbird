@@ -392,9 +392,9 @@ public class Tag : GLib.Object {
 			warn ("No name for tag.");
 			return -1;
 		}
-	
-		index = entire_file.get_index (data) + start;
 		
+		index = entire_file.get_index (data) + start;
+
 		if (unlikely (index >= entire_file.length)) {
 			warn ("Unexpected end of file");
 			error = true;
@@ -408,7 +408,7 @@ public class Tag : GLib.Object {
 					error = true;
 					return -1;
 				}	
-
+		
 				if (entire_file.substring (index).has_prefix ("<")) {
 					break;
 				}
@@ -663,9 +663,7 @@ public class Tag : GLib.Object {
 	}
 	
 	internal void warn (string message) {
-		if (log_level == WARNINGS) {
-			XmlParser.warning (message);
-		}
+		XmlParser.warning (message);
 	}
 }
 
