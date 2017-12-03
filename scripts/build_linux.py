@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import os
+import glob
 
 from config import PREFIX
 from run import run
@@ -10,7 +11,7 @@ from pkgconfig import generate_pkg_config_file
 run ("mkdir -p build/bin");
 
 run ("valac --ccode --pkg posix --library libxmlbird --vapi=xmlbird.vapi "
-     + "--directory=./build -H ./build/xmlbird.h libxmlbird/*.vala");
+     + "--directory=./build -H ./build/xmlbird.h " + " ".join(sorted(glob.glob('libxmlbird/*.vala'))))
 
 run ("""gcc -fPIC -c \
      $(pkg-config --cflags glib-2.0) \
