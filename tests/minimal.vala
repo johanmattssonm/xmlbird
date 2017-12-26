@@ -9,6 +9,9 @@ public static int main (string[] arg) {
 	t = new B.Test ("""<nesting><nested><nested><inside/></nested></nested></nesting>""");
 	t.test ("nesting nested nested inside");
 
+	t = new B.Test ("""<nesting><closed /><inside /></nesting>""");
+	t.test ("nesting closed inside");
+	
 	t = new B.Test ("""<a><!-- Comment --><b /></a>""");
 	t.test ("a b");
 
@@ -32,12 +35,8 @@ public static int main (string[] arg) {
 		print (@"Xml encoding passed: $needs_encoding == $decoded\n");
 	}
 	
-	XmlParser parser;
-	parser = new XmlParser ("<tag1><tag1><tag2/></tag1>");
-	assert (!parser.validate ());
-
-	parser = new XmlParser ("<root>");
-	assert (!parser.validate ());
+	t = new B.Test ("<svg><g id=\"one\" ><g><g></g><g /></g></g></svg>");
+	t.test ("svg g id one g g g");
 	
 	return 0;
 }

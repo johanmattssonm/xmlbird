@@ -447,8 +447,11 @@ public class Tag : GLib.Object {
 							return previous_index;
 						}
 					}
+					
 				} else if (is_tag (entire_file, name, tag_start)) {
-					start_count++;
+					if (!is_self_closing (entire_file, tag_start)) {
+						start_count++;
+					}
 				} 
 			}
 		}
@@ -457,6 +460,39 @@ public class Tag : GLib.Object {
 		warn (@"No closing tag for $(name.to_string ())");
 		
 		return -1;
+	}
+	
+	bool is_self_closing (XmlData tag, int start) {
+		Tag all_tags = new Tag.empty ();
+		all_tags.entire_file = entire_file;
+		all_tags.data = entire_file;
+		
+		int index = all_tags.find_end_of_tag (start);
+		int end = index;
+		unichar c_data;
+		unowned string s;
+		unowned string? n = (string) tag.data;
+		
+		int closing_slash = start;
+		
+		return_val_if_fail (n != null, true);
+		
+		s = (!) n;
+		
+		while (s.get_prev_char (ref index, out c_data) && index > start) {
+			if (c_data == '>' || c_data == ' ' || c_data == '\t' 
+				|| c_data == '\n' || c_data == '\r') {
+				continue;	
+			}
+			
+			if (c_data == '/') {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		
+		return false;
 	}
 	
 	string parse_name (XmlData data, int index) {
