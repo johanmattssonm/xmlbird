@@ -74,15 +74,15 @@ dest = options.dest
 
 libdir = config.LIBDIR
 if "openbsd" in sys.platform:
-	install ('build/bin/libxmlbird.so.' + '${LIBxmlbird_VERSION}', libdir, 644)
+	install ('build/bin/libxmlbird.so.' + '${LIBxmlbird_VERSION}', libdir, 755)
 elif os.path.isfile ('build/bin/libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION):
-	install ('build/bin/libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION, libdir, 644)
+	install ('build/bin/libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION, libdir, 755)
 	link (libdir, 'libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION, ' libxmlbird.so')
 elif os.path.isfile ('build/libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION):
-	install ('build/libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION, libdir, 644)
+	install ('build/libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION, libdir, 755)
 	link (libdir, 'libxmlbird.so.' + version.LIBXMLBIRD_SO_VERSION, ' libxmlbird.so')
 elif os.path.isfile ('build/bin/libxmlbird-' + version.LIBXMLBIRD_SO_VERSION_MAJOR + '.dylib'):
-	install ('build/bin/libxmlbird-' + version.LIBXMLBIRD_SO_VERSION_MAJOR + '.dylib', libdir, 644)
+	install ('build/bin/libxmlbird-' + version.LIBXMLBIRD_SO_VERSION_MAJOR + '.dylib', libdir, 755)
 	link (libdir, 'libxmlbird-' + version.LIBXMLBIRD_SO_VERSION_MAJOR + '.dylib', ' libxmlbird.dylib')
 else:
    print("Can't find libxmlbird, so-version: " + str(version.LIBXMLBIRD_SO_VERSION))
