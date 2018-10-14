@@ -93,6 +93,8 @@ for target in TARGETS:
 if not options.prefix:
 	if 'bsd' in sys.platform:
 		options.prefix = '${DESTDIR}${PREFIX}'
+	elif sys.platform == 'darwin':
+		options.prefix = '/usr/local'
 	else:
 		options.prefix = '/usr'
 
