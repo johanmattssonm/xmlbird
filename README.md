@@ -1,6 +1,6 @@
 ![xmlbird logo][xmlbird]
 
-# XML Bird - XML parser
+# XML Bird – XML parser
 
 XML Bird is an XML parser for programs written in Vala or C.
 
