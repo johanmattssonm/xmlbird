@@ -131,7 +131,7 @@ public class XmlElement : GLib.Object {
 	}
 
 	public class Iterator : GLib.Object {
-		int index = 0;
+		int index = -1;
 		Elements? xml_elements;
 		
 		internal Iterator (Elements? xml_elements) {
@@ -144,6 +144,8 @@ public class XmlElement : GLib.Object {
 			}
 			
 			Elements e = (!) xml_elements;
+			index++;
+			
 			return index < e.size;
 		}
 
@@ -154,8 +156,13 @@ public class XmlElement : GLib.Object {
 			}
 			
 			Elements e = (!) xml_elements;
+			
+			if (unlikely (index >= e.size || index < 0)) {
+				XmlParser.warning (@"Element index out of bounds ($index >= $(e.size)).");
+				return new XmlElement.empty ();
+			}
+			
 			XmlElement element = e.get_element (index);
-			index++;
 			return element;
 		}
 	}

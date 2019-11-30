@@ -16,7 +16,7 @@ namespace B {
 
 /** 
  * Representation of a string in the XmlParser. This class adds reference 
- * counting and copies a pointer to string instead of the data. It is 
+ * counting and copies a pointer to the string instead of the data. It is 
  * faster if the string is big.
  */
 internal class XmlString : GLib.Object {	
