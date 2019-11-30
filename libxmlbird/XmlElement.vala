@@ -38,10 +38,7 @@ public class XmlElement : GLib.Object {
 		attributes = parse_attributes (tag);
 
 		leaf = children == null;
-		
-		if (leaf) {
-			content = tag.get_content ();
-		}
+		content = tag.get_content ();
 	}
 
 	internal XmlElement.attribute (Attribute attribute) {
