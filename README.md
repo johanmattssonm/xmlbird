@@ -8,9 +8,6 @@ XML Bird is an XML parser for programs written in Vala or C.
     License: LGPL v3
     Webpage: https://birdfont.org/xmlbird.php
 
-[![Build Status](https://travis-ci.org/johanmattssonm/xmlbird.svg?branch=master)]
-(https://travis-ci.org/johanmattssonm/xmlbird)
-
 ## Building from Source
 
 Install valac and Glib first.
