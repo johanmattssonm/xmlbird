@@ -50,6 +50,22 @@ def configure(valac):
 		print (FAIL + "valac is too old." + ENDC)
 		exit (1)
 
+def is_debian():
+  try:
+  	version = platform.version()
+  	print("OS Version: " + version)
+  	
+  	if version.find("Ubuntu") > -1:
+  		return True
+
+  	if version.find("Debian") > -1:
+  		return True
+  		
+  except:
+    return False
+    
+  return False
+  
 parser = OptionParser()
 parser.add_option('-p', '--prefix', dest='prefix', help='Install prefix', metavar='PREFIX')
 parser.add_option('-l', '--libdir', dest='libdir', help='path to directory for shared libraries (lib or lib64).', metavar='LIBDIR')
@@ -101,7 +117,7 @@ if not options.prefix:
 if not options.libdir:
 	if sys.platform == 'darwin':
 		options.libdir = '/lib'
-	elif platform.dist()[0] == 'Ubuntu' or platform.dist()[0] == 'Debian':
+	elif is_debian():
 		process = subprocess.Popen(['dpkg-architecture', '-qDEB_HOST_MULTIARCH'], stdout=subprocess.PIPE)
 		out, err = process.communicate()
 		options.libdir = 'lib/' + out.decode('UTF-8').rstrip('\n')
