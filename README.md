@@ -24,8 +24,7 @@ Configure, build and install without doit:
     ./build.py
     sudo ./install.py
 
-The default prefix is /usr/local on some systems should XML Bird be 
-compiled with /usr as prefix.
+The default prefix is /usr/local but you can set the prefix to /usr
 
     ./configure --prefix=/usr
 
