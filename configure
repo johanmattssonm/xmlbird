@@ -73,6 +73,7 @@ parser.add_option('-d', '--dest', dest='dest', help='Install to this directory',
 parser.add_option('-c', '--cc', dest='cc', help='C compiler', metavar='CC')
 parser.add_option('-v', '--valac', dest='valac', help='Vala compiler', metavar='VALAC')
 parser.add_option('-n', '--nonnull', dest='nonnull', action="store_true", help='Enable compiletime checks for null pointers', metavar='NONNULL')
+parser.add_option('-t', '--disable-dependency-tracking', dest='deptrack', action="store_true", help='Not in use', metavar='DEPTRACK')
 
 parser.add_option('', '--valac-flags', dest='valac_flags', help='Vala compiler flags for all targets', metavar='VALAC_FLAGS', default='')
 for target in TARGETS:
