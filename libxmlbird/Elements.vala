@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2016 Johan Mattsson
+	Copyright (C) 2016 2023 Johan Mattsson
 
 	This library is free software; you can redistribute it and/or modify 
 	it under the terms of the GNU Lesser General Public License as 
@@ -45,7 +45,7 @@ internal class Elements : GLib.Object {
 		if (size >= capacity) {
 			int new_capacity = 2 * capacity;
 			XmlElement** new_data = new XmlElement*[new_capacity];
-			Posix.memcpy (new_data, data, sizeof (double) * size);
+			Posix.memcpy (new_data, data, sizeof (XmlElement*) * size);
 			delete data;
 			data = new_data;
 			capacity = new_capacity;
