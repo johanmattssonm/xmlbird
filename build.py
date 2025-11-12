@@ -8,7 +8,7 @@ from scripts import config
 from scripts import version
 from scripts import tests
 
-if platform == 'msys':
+if platform == 'win32':
 	process_tasks(dodo.make_libxmlbird('libxmlbird.dll'))
 elif platform == 'darwin':
 	lib = "libxmlbird-" + str(version.LIBXMLBIRD_SO_VERSION_MAJOR) + '.dylib'
