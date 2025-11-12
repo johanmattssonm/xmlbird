@@ -19,7 +19,7 @@ DOIT_CONFIG = {
 all_tests = tests.all_tests ();
 
 def soname(target_binary):
-    if "darwin" in sys.platform or "msys" in sys.platform:
+    if "darwin" in sys.platform or "win32" in sys.platform:
         return ''
         
     return '-Wl,-soname,' + target_binary
